@@ -1,0 +1,100 @@
+
+@import './comun'
+@import './lib/atajos'
+
+@import './base/botones'
+@import './base/inputs'
+
+//
+// General
+*
+	margin: 0
+	padding: 0
+
+html
+	font-size: 10px !important
+	font-family: $fontFamily
+
+	.aMano
+		font-family: $fontFamilyAMano
+		+fwr
+
+pre, code
+	font-family: $fontFamilyCodigo
+
+body
+	font-size: 1.4rem
+	min-height: 100vh
+	color: $bodyColor
+	background-color: $bodyFondo
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6
+	margin-top: 0
+	margin-bottom: 0.5rem
+	color: $titulosColor
+	+fwm
+
+a
+	color: inherit
+	text-decoration: none
+	&:visited, &:active, &:hover,
+	&:-webkit-any-link
+		color: $linksColor
+
+strong, b
+	+fwm
+
+
+
+// Imagenes como background o mask
+.bgcov
+	+bgcov
+.bgcon
+	+bgcon
+.micov
+	+micov
+.micon
+	+micon
+
+
+.w1em
+	width: 1em
+.w1rem
+	width: 1rem
+.h1em
+	height: 1em
+.h1rem
+	height: 1rem
+
+.minh100vh
+	min-height: 100vh
+
+.minw100vw
+	min-width: 100vw
+//
+//
+// Cubre pantallas para overlay simple durante procesos
+.cubrePantalla
+	position: fixed
+	top: 0
+	left: 0
+	bottom: 0
+	right: 0
+	z-index: 100
+	background-color: transparentize(white, .5)
+	backdrop-filter: blur(.3rem)
+
+	display: flex
+	flex-flow: column nowrap
+	justify-content: center
+	align-items: center
+	+salir
+		opacity: 0
+
+	.ant-icon
+		font-size: 3rem

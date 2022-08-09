@@ -1,0 +1,74 @@
+
+@import '../comun'
+
+.boton
+	display: block
+	margin: 0
+	padding: 0.5rem 1rem
+
+	cursor: pointer
+	user-select: none
+
+	background-color: transparent
+	color: $primario
+	border-color: $primario
+	border-width: 1px
+	border-style: solid
+
+	+radio
+	+fwm
+
+	font-size: 1.8rem
+
+	display: flex
+	align-items: center
+	text-align: center
+
+	&.primario
+		background-color: $primario
+		color: $blanco
+	&.secundario
+		background-color: $secundario
+		color: $blanco
+
+	&.acento
+		background-color: $acento
+		
+	&.exito
+		background-color: $exito
+	&.atencion
+		background-color: $atencion
+	&.error
+		background-color: $error
+
+	&.negro
+		background-color: $negro
+		color: $blanco
+		border-color: transparent
+		&:hover,
+		&:focus
+			background-color: $oscuro
+			color: $blanco
+			border-color: $secundario
+
+	// &.primario,
+	// &.ant-btn-primary
+		background-color: $primario
+		color: $blanco
+		&:hover
+			background-color: $primario
+			color: $blanco
+			border-color: $acento
+
+
+	&.w100
+		width: 100%
+
+
+	&.disabled,
+	&[disabled]
+		&,
+		&:hover,
+		&:focus,
+		&:active
+			filter: saturate(0) contrast(.8)

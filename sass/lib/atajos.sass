@@ -1,0 +1,337 @@
+@import '../comun'
+
+
+.noMovil
+	+movil
+		display: none
+
+.noCompu
+	+compu
+		display: none
+
+.fwl
+	+fwl
+.fwr
+	+fwr
+.fwm
+	+fwm
+.fwb
+	+fwb
+.fwbb
+	+fwbb
+.fsi
+	+fsi
+
+// Radios
+
+//
+
+.radio
+	+radio
+.radio2
+	+radio2
+.radio3
+	+radio3
+
+.br1em
+	border-radius: 1em
+
+.sombra
+	+sombra
+
+.sombra2
+	+sombra2
+
+.sombra3
+	+sombra3
+
+.circulo
+	width: 1em
+	height: 1em
+	border-radius: 1em
+	line-height: 0
+
+// Colores
+.colorClaro
+	color: $claro
+.colorMedioClaro
+	color: $medioClaro
+.colorMedio
+	color: $medio
+.colorMedioOscuro
+	color: $medioOscuro
+.colorOscuro
+	color: $oscuro
+
+// Fondos
+.fondoClaro
+	background-color: $claro
+.fondoMedioClaro
+	background-color: $medioClaro
+.fondoMedio
+	background-color: $medio
+.fondoMedioOscuro
+	background-color: $medioOscuro
+.fondoOscuro
+	background-color: $oscuro
+
+
+// Colores basicos
+body
+	.colorPrimario
+		color: $primario
+	.colorAcento
+		color: $acento
+	.colorSecundario
+		color: $secundario
+	.colorExito
+		color: $exito
+	.colorAtencion
+		color: $atencion
+	.colorError
+		color: $error
+	.colorGris
+		color: $medio
+	.colorBlanco
+		color: $blanco
+	.colorNegro
+		color: $negro
+
+	.fondoPrimario
+		background-color: $primario
+	.fondoAcento
+		background-color: $acento
+	.fondoSecundario
+		background-color: $secundario
+	.fondoExito
+		background-color: $exito
+	.fondoAtencion
+		background-color: $atencion
+	.fondoError
+		background-color: $error
+	.fondoGris
+		background-color: $medio
+	.fondoBlanco
+		background-color: $blanco
+	.fondoNegro
+		background-color: $negro
+
+
+
+		// Anchos
+
+.ancho
+	width: 100%
+.anchoComun
+	+anchoComun
+.anchoWrapper
+	+anchoWrapper
+
+// Z index
+.z0
+	z-index: 0
+.z1
+	z-index: 1
+.z2
+	z-index: 2
+.z3
+	z-index: 3
+.z4
+	z-index: 4
+
+// Position
+
+.posr
+	position: relative
+.posa
+	position: absolute
+	&.maximizar
+		top: 0
+		bottom: 0
+		left: 0
+		right: 0
+// 
+// Display
+
+.db
+	display: block
+.dib
+	display: inline-block
+
+.flex
+	display: flex
+	&.jcc
+		justify-content: center
+	&.jcsb
+		justify-content: space-between
+	&.jcsa
+		justify-content: space-around
+	&.jcfs
+		justify-content: flex-start
+	&.jcfe
+		justify-content: flex-end
+	&.aic
+		align-items: center
+	&.aifs
+		align-items: flex-start
+	&.aife
+		align-items: flex-end
+
+	&.ffcn
+		flex-flow: column nowrap
+	&.ffcw
+		flex-flow: column wrap
+	&.ffrn
+		flex-flow: row nowrap
+	&.ffrw
+		flex-flow: row wrap
+
+.fa11
+	flex: auto 1 1
+.fa00
+	flex: auto 0 0
+.fa10
+	flex: auto 1 0
+.fa01
+	flex: auto 0 1
+
+.fg0
+	flex-grow: 0
+.fg1
+	flex-grow: 1
+.fg2
+	flex-grow: 2
+.fg3
+	flex-grow: 3
+
+.fs0
+	flex-shrink: 0
+.fs1
+	flex-shrink: 1
+
+.minh0
+	min-height: 0
+.minh100vh
+	min-height: 100vh
+
+//
+// Alineación de texto
+.tac
+	text-align: center
+.tal
+	text-align: left
+.tar
+	text-align: right
+
+//
+
+//
+// Tamaños de fuente y espaciados
+//
+
+$sizes: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20
+
+// Tamaños de fuente
+@each $size in $sizes
+	.fz#{$size}rem
+		font-size: #{$size}rem
+
+// Paddings
+@each $size in $sizes
+	.p#{$size}rem
+		padding: #{$size}rem
+	.pt#{$size}rem
+		padding-top: #{$size}rem
+	.pb#{$size}rem
+		padding-bottom: #{$size}rem
+	.pl#{$size}rem
+		padding-left: #{$size}rem
+	.pr#{$size}rem
+		padding-right: #{$size}rem
+	.px#{$size}rem
+		padding-left: #{$size}rem
+		padding-right: #{$size}rem
+	.py#{$size}rem
+		padding-top: #{$size}rem
+		padding-bottom: #{$size}rem
+
+// Margins
+.m0a
+	margin: 0 auto
+.ma0
+	margin: auto 0
+
+@each $size in $sizes
+	.m#{$size}rem
+		margin: #{$size}rem
+	.mt#{$size}rem
+		margin-top: #{$size}rem
+	.mb#{$size}rem
+		margin-bottom: #{$size}rem
+	.ml#{$size}rem
+		margin-left: #{$size}rem
+	.mr#{$size}rem
+		margin-right: #{$size}rem
+	.mx#{$size}rem
+		margin-left: #{$size}rem
+		margin-right: #{$size}rem
+	.my#{$size}rem
+		margin-top: #{$size}rem
+		margin-bottom: #{$size}rem
+
+
+.capitalizar
+	text-transform: capitalize
+
+.test
+	border: 1px solid red
+	.test
+		border: 1px solid blue
+		.test
+			border: 1px solid green
+			.test
+				border: 1px solid magenta
+				.test
+					border: 1px solid orangered
+
+
+.lh0
+	line-height: 0
+.lh1
+	line-height: 1
+.lh
+	line-height: 1.4
+
+
+
+$opacidades: 1, 2, 3, 4, 5, 6, 7, 8, 9
+
+// Tamaños de fuente
+@each $op in $opacidades
+	.op0#{$op}
+		opacity: calc(#{$op} / 10)
+
+.op1
+	opacity: 1
+
+
+
+.nowrap
+	white-space: nowrap
+	
+.tdlt
+	text-decoration: line-through
+
+.tdt02rem
+	text-decoration-thickness: .2rem
+
+.tdcClaro
+	text-decoration-color: $claro
+.tdcMedioClaro
+	text-decoration-color: $medioClaro
+.tdcMedio
+	text-decoration-color: $medio
+.tdcMedioOscuro
+	text-decoration-color: $medioOscuro
+.tdcOscuro
+	text-decoration-color: $oscuro

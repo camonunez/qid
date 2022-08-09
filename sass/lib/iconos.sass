@@ -1,0 +1,82 @@
+@import './vars'
+
+$carpetaIconos: '/svg/sociales'
+
+$mini: check cruz mas ojo play chevron flecha menos pausa triangulo
+$genericos: engranaje escribir firmar grafico huelladedo indicaciones link llave lupa mapa mensaje mosaico ojo pasaporte reloj union repetir sincronizar
+
+$setsIconos: (mini: $mini, genericos: $genericos)
+
+.oicono
+	flex: auto 0 0
+	display: inline-block
+	width: 1em
+	height: 1em
+	position: relative
+	
+
+	// icono como background-image (color del icono original)
+	&.b
+		+bgcon
+	// icono como mask-image (color del icono es heredado)
+	&, &.m
+		&::after
+			content: ''
+			display: block
+			width: inherit
+			height: inherit
+			+micon
+			background-color: currentColor
+
+			
+	@each $carpeta, $iconos in $setsIconos
+		@each $icono in $iconos
+			&.#{$icono}
+				&::after
+					content: ''
+					display: block
+					position: absolute
+					top: 0
+					left: 0
+					// width: inherit
+					// height: inherit
+					right: 0
+					bottom: 0
+					$loc: '/iconos/#{$carpeta}/#{$icono}.svg'
+					mask-image: url($loc)
+					
+
+	// Transformaciones
+	&.flipY
+		&::after
+			transform: scaleY(-1)
+	&.flipX
+		&::after
+			transform: scaleX(-1)
+	&.rot90
+		&::after
+			transform: rotate(90deg)
+	&.rot45
+		&::after
+			transform: rotate(45deg)
+	&.rot135
+		&::after
+			transform: rotate(135deg)
+	&.rot225
+		&::after
+			transform: rotate(225deg)
+	&.rot270
+		&::after
+			transform: rotate(270deg)
+	&.rot315
+		&::after
+			transform: rotate(315deg)
+
+	// Circunscrito a un circulo
+
+	&.enCirculo
+		background-color: currentColor
+		border-radius: 1em
+		&::after
+			+micon
+			background-color: white
