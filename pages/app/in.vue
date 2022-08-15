@@ -1,22 +1,34 @@
 <template lang="pug">
 .flex.jcc.aic.minh100vh
 
-	.anchoComun
-		h1 IN!
-		p {{ $usuario }}
-		.boton.primario(@click="$usuario.nombre = 'Pepe'") Cambiar nombre readonly
-		.boton.primario(@click="$usuarioEditable.nombre = 'Pepe'") Cambiar nombre editable
+	div(v-if="$usuario === [2]") Cargando...
+	div(v-if="$usuario === null") Cargando...
+	div(v-else-if="$usuario === false") 
+		b No conectado
+		//- SesionIngreso
+	NuxtChild(v-else)
 	
 
 </template>
-<script setup>
-console.log('hello script setup')
-// import IconAccountCircle from "~icons/mdi/account-circle";
-function log() {
-	console.log(msg)
+<script setup lang="ts">
+import { useNuxtApp, useHead } from 'nuxt/app'
+import { z } from 'zod'
+
+const { $usuario, $rosetta } = useNuxtApp()
+
+if (typeof window !== 'undefined') {
+	// @ts-ignore
+	window.z = z
 }
-const { $usuario, $usuarioEditable } = useNuxtApp()
-definePageMeta({
-	title: 'Cuerdos'
+
+const traductor = $rosetta({
+	noConectado: {
+		es: 'No conectado',
+		en: 'Not connected'
+	}
+})
+
+useHead({
+	title: 'In'
 })
 </script>

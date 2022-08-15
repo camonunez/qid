@@ -14,6 +14,10 @@ export default defineNuxtConfig({
 		],
 	},
 
+	typescript: {
+		typeCheck: true,
+	},
+
 	runtimeConfig: {
 		// The private keys which are only available within server-side
 		// apiSecret: '123',
@@ -25,4 +29,11 @@ export default defineNuxtConfig({
 	},
 
 	css: ['~/sass/base.sass'],
+
+	head: {
+		link: [
+			{ rel: 'icon', type: 'image/x-icon', href: 'favicon.svg' },
+			{ href: '/fonts/stylesheet.css', rel: 'stylesheet', hid: 'dmsans' }
+		]
+	}
 })

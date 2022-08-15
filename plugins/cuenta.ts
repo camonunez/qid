@@ -304,7 +304,7 @@ const cuentaAPI = {
 	}
 }
 
-export const usuario = readonly(sesion).usuario
+export const usuario = computed(() => sesion.usuario)
 
 export default defineNuxtPlugin(nuxtApp => {
 	try {

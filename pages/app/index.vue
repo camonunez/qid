@@ -1,22 +1,28 @@
 <template lang="pug">
-.flex.jcc.aic.minh100vh
+//- .flex.jcc.aic.minh100vh
+.anchoWrapper.minh100vh
 
-	.anchoComun
-		h1 TBD
-
-		.mt2rem
-			NuxtLink.boton.primario(to="/app/in") Entrar
-	
+	//- .anchoComun
+		div(v-if="$usuario === null") Cargando...
+		div(v-else-if="$usuario === false") 
+			.boton(@click="") Conectar
+		div.flex.aic.jcfs(v-else) 
+			// Avatar
+			.br10em.flec.jcc.aic
+				.tac {{$usuario.nombre[0]}}
+			// Datos usuario
+			.ml1rem
+				div {{$usuario.nombre}}
+	h1 Esto es un landing
+	NuxtLink(to='/app/in') Entrar
 
 </template>
 <script setup>
-console.log('hello script setup')
-// import IconAccountCircle from "~icons/mdi/account-circle";
-function log() {
-	console.log(msg)
-}
+const { $usuario } = useNuxtApp()
 
-definePageMeta({
-	title: 'Cuerdos'
+function log(msg) { console.log(msg) }
+
+useHead({
+	title: 'App'
 })
 </script>
