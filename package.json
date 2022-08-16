@@ -8,7 +8,7 @@
   },
   "devDependencies": {
     "@ant-design/icons-vue": "^6.1.0",
-    "@iconify-json/mdi": "^1.1.29",
+    "@iconify-json/mdi": "^1.1.30",
     "@types/lodash": "^4.14.182",
     "nuxt": "3.0.0-rc.6",
     "pug": "^3.0.2",

@@ -4,7 +4,7 @@
 
 	h1 IN!!
 
-	NuxtLink(to="/app/in/r") {{t('recuerdos')}}
+	NuxtLink(to="/a/in/r") {{t('recuerdos')}}
 
 </template>
 <script setup>

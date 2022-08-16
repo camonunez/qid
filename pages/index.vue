@@ -4,7 +4,7 @@
 	.anchoComun
 		h1 Hola
 
-		NuxtLink.boton(to="/app") App
+		NuxtLink.boton(to="/a") App
 		NuxtLink.boton.primario(@click="log('test;')") test
 	
 
