@@ -1,14 +1,27 @@
-type ExtraerVariables<S extends string> = string extends S
+type ExtraerVariables<T extends string> = string extends T
 	? string[]
-	: S extends ''
+	: T extends ''
 	? []
-	: S extends `${infer pre}{{${infer Variable}}}${infer post}`
+	: T extends `${infer pre}{{${infer Variable}}}${infer post}`
 	? [Variable, ...ExtraerVariables<post>]
 	: []
 
 type ArmarObjeto<I extends string[]> = I extends [] ? never : { [k in I[number]]: string | number }
 
-type Interpolable<T> = T extends string ? ArmarObjeto<ExtraerVariables<T>> : never
+export type Interpolable<T> = T extends string ? ArmarObjeto<ExtraerVariables<T>> : never
+
+type awda = Interpolable<'Hola {{nombre}} {{apellido}}, qué tal?'>
+type fef = keyof awda
+
+type VariablesInterpoladas<T extends string, Variables extends Interpolable<T>> = string extends T
+	? string
+	: T extends ''
+	? ''
+	: T extends `${infer pre}{{${infer Variable}}}${infer post}`
+	? `${pre}${Variables[Variable]}${VariablesInterpoladas<post, Interpolable<post>>}`
+	: ''
+
+type VIT1 = VariablesInterpoladas<'Hola {{nombre}} {{apellido}}, qué tal?', { nombre: 'Paco'; apellido: 'Wala' }>
 
 function interpolarVars<T extends string>(textual: T): T
 function interpolarVars<T extends string>(textual: T, variables: Interpolable<T>): T
