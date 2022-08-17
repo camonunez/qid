@@ -25,6 +25,7 @@
     "less": "^4.1.3",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
+    "nanotween": "^0.8.0",
     "sass": "^1.54.3",
     "ts-toolbelt": "^9.6.0",
     "zod": "^3.17.10"
