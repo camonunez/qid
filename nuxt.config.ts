@@ -1,14 +1,14 @@
 import { defineNuxtConfig } from 'nuxt'
-import Components from 'unplugin-vue-components/vite'
 
 import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
+import Components from 'unplugin-vue-components/vite'
 
 export default defineNuxtConfig({
 	vite: {
 		plugins: [
 			Components({
-				resolvers: [IconsResolver({ prefix: false, enabledCollections: ['mdi'] })]
+				resolvers: [IconsResolver()]
 			}),
 			Icons()
 		],
@@ -36,5 +36,5 @@ export default defineNuxtConfig({
 			{ rel: 'icon', type: 'image/x-icon', href: 'favicon.svg' },
 			{ href: '/fonts/stylesheet.css', rel: 'stylesheet', hid: 'dmsans' }
 		]
-	}
+	},
 })

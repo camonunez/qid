@@ -1,3 +1,4 @@
+@use 'sass:math'
 @import '../comun'
 
 
@@ -234,11 +235,16 @@ body
 //
 
 $sizes: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20
+$decimales: 1, 2, 3, 4, 5, 6, 7, 8, 9
 
 // Tamaños de fuente
 @each $size in $sizes
 	.fz#{$size}rem
 		font-size: #{$size}rem
+@each $decena in $decimales
+	@each $size in $sizes
+		.fz-#{$size}rem
+			font-size: #{math.div($size, 10)}rem
 
 // Paddings
 @each $size in $sizes
@@ -258,6 +264,25 @@ $sizes: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20
 	.py#{$size}rem
 		padding-top: #{$size}rem
 		padding-bottom: #{$size}rem
+
+@each $decena in 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+	@each $digito in $decimales
+		.p-#{$decena}#{$digito}rem
+			padding: #{math.div($digito + ($decena * 10), 10)}rem
+		.pt-#{$decena}#{$digito}rem
+			padding-top: #{math.div($digito + ($decena * 10), 10)}rem
+		.pb-#{$decena}#{$digito}rem
+			padding-bottom: #{math.div($digito + ($decena * 10), 10)}rem
+		.pl-#{$decena}#{$digito}rem
+			padding-left: #{math.div($digito + ($decena * 10), 10)}rem
+		.pr-#{$decena}#{$digito}rem
+			padding-right: #{math.div($digito + ($decena * 10), 10)}rem
+		.px-#{$decena}#{$digito}rem
+			padding-left: #{math.div($digito + ($decena * 10), 10)}rem
+			padding-right: #{math.div($digito + ($decena * 10), 10)}rem
+		.py-#{$decena}#{$digito}rem
+			padding-top: #{math.div($digito + ($decena * 10), 10)}rem
+			padding-bottom: #{math.div($digito + ($decena * 10), 10)}rem
 
 // Margins
 .m0a
@@ -312,7 +337,7 @@ $opacidades: 1, 2, 3, 4, 5, 6, 7, 8, 9
 
 // Tamaños de fuente
 @each $op in $opacidades
-	.op0#{$op}
+	.op-#{$op}
 		opacity: calc(#{$op} / 10)
 
 .op1
@@ -339,3 +364,15 @@ $opacidades: 1, 2, 3, 4, 5, 6, 7, 8, 9
 	text-decoration-color: $medioOscuro
 .tdcOscuro
 	text-decoration-color: $oscuro
+
+
+
+// Otras utilidades
+
+.usn
+	user-select: none
+
+.cursorPointer
+	cursor: pointer
+.cursorNotAllowed
+	cursor: not-allowed

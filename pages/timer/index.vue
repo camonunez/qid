@@ -2,12 +2,14 @@
 //- .flex.jcc.aic.minh100vh
 .anchoWrapper.minh100vh
 
+	.my2rem
+		NuxtLink(to="/timer/tabata") Tabata
 	.centerized
 		h2 Countdown
 		//- #over(style="display: none") Time is over
 
-		div tiempoTranscurrido {{tiempoTranscurrido.format('HH:mm:ss SSS')}}
-		div typeof tiempoTranscurrido {{typeof tiempoTranscurrido}}
+		div tiempoCronometrado {{tiempoCronometrado.format('HH:mm:ss SSS')}}
+		div typeof tiempoCronometrado {{typeof tiempoCronometrado}}
 
 		.p2rem
 			button(@click="cronometrar" :disabled="cronometro.estaIniciado && !cronometro.estaTerminado") Iniciar
@@ -19,13 +21,36 @@
 		.pb2rem
 			h3 Historial
 
-		.cronometrados keys {{Object.keys(historialCronometrados)}}
-		.cronometrados length {{Object.keys(historialCronometrados).length}}
+		//- .cronometrados keys {{Object.keys(historialCronometrados)}}
+		//- .cronometrados length {{Object.keys(historialCronometrados).length}}
+
 		.cronometrados(v-if="Object.keys(historialCronometrados).length > 0")
+
 			.cronometrado(v-for="crono in historialCronometrados" :key="crono.id")
+
 				.flex.jcsb 
-					.inicio(v-if="crono.tiempoAlInicio") {{crono.tiempoAlInicio.format('HH:mm:ss SSS')}}
-					.inicio(v-if="crono.tiempoAlTerminar") {{crono.tiempoAlTerminar.format('HH:mm:ss SSS')}}
+					// Inicio y fin
+					.flex
+						div(v-if="crono.tiempoAlInicio") {{crono.tiempoAlInicio.format('H:mm a')}}
+						div(v-if="crono.tiempoAlTerminar") {{crono.tiempoAlTerminar.format('H:mm a')}}
+
+					// Pausas
+					.flex(v-if="crono.historial")
+						div {{crono.historial.filter(h => h.evento === 'reanudacion').length}} Pausas
+
+					// Tiempo cronometrado
+					div(v-if="crono.tiempoCronometrado") 
+						| {{dayjs.duration(crono.tiempoCronometrado).format('m')}} minutos, {{dayjs.duration(crono.tiempoCronometrado).format('s')}} segundos
+
+				//.flex.jcsb(v-for="registro in crono.historial")
+
+				// Fin
+				//.flex.jcsb 
+					//- div(v-if="crono.tiempoAlInicio") {{crono.tiempoAlInicio.format('H:mm a')}}
+					.div(v-if="crono.tiempoAlTerminar") {{crono.tiempoAlTerminar.format('H:mm a')}}
+
+					div(v-if="crono.tiempoCronometrado") {{dayjs.duration(crono.tiempoCronometrado).format('HH:mm:ss SSS')}}
+					//- .fin(v-if="crono.tiempoCronometrado") {{dayjs.duration(crono.tiempoCronometrado).humanize()}}
 
 
 </template>
@@ -52,9 +77,15 @@ const t = rosetta({
 
 type Cronometrado = {
 	id: string
+
 	tiempoAlInicio: Dayjs
 	tiempoAlTerminar: Dayjs
-	tiempoTranscurrido: number
+	tiempoCronometrado: number
+
+	historial: {
+		evento: string
+		tiempo: Dayjs
+	}[]
 }
 
 const historialCronometrados = ref<Record<string, Cronometrado>>({})
@@ -66,12 +97,17 @@ type Cronometro = {
 	tiempoAlPausar: Dayjs | null
 
 	tiempoAlTranscurrido: Dayjs | null
-	tiempoTranscurrido: number
-	// tiempoTranscurrido: Dayjs | null
+	tiempoCronometrado: number
+	// tiempoCronometrado: Dayjs | null
 
 	estaIniciado: boolean
 	estaPausado: boolean
-	estaTerminado: boolean
+	estaTerminado: boolean,
+
+	historial: {
+		evento: 'pausa' | 'reanudacion'
+		tiempo: Dayjs
+	}[]
 }
 
 const nuevoCronometro = () => ({
@@ -81,16 +117,19 @@ const nuevoCronometro = () => ({
 	tiempoAlPausar: null,
 
 	tiempoAlTranscurrido: null,
-	tiempoTranscurrido: 0,
+	tiempoCronometrado: 0,
 
 	estaIniciado: false,
 	estaPausado: false,
-	estaTerminado: false
+	estaTerminado: false,
+
+	historial: []
 })
+
 const cronometro = ref<Cronometro>(nuevoCronometro())
 
-const tiempoTranscurrido = computed (() => {
-	return dayjs.duration(cronometro.value.tiempoTranscurrido)
+const tiempoCronometrado = computed (() => {
+	return dayjs.duration(cronometro.value.tiempoCronometrado)
 })
 
 function cronometrar() {
@@ -100,25 +139,29 @@ function cronometrar() {
 	if (!cronometro.value.estaIniciado) {
 		cronometro.value.estaIniciado = true
 		cronometro.value.tiempoAlInicio = ahora
+		cronometro.value.estaTerminado = false
 	}
 
 	// Abortar si está pausado o terminado
 	if (cronometro.value.estaPausado) {
-		console.log('Abortando cronometro estaPausado', JSON.parse(JSON.stringify(cronometro.value)))
+		// console.log('Abortando cronometro estaPausado', JSON.parse(JSON.stringify(cronometro.value)))
 		return
 	}
 	if (cronometro.value.estaTerminado) {
-		console.log('Abortando cronometro estaTerminado', JSON.parse(JSON.stringify(cronometro.value)))
+		// console.log('Abortando cronometro estaTerminado', JSON.parse(JSON.stringify(cronometro.value)))
+		return
+	}
+	if (cronometro.value.estaTerminado) {
+		// console.log('Abortando cronometro estaTerminado', JSON.parse(JSON.stringify(cronometro.value)))
 		return
 	}
 
 	// Corre el tiempo
 	const duracionTramoAnterior = cronometro.value.tiempoAlTranscurrido ? dayjs.duration(ahora.diff(cronometro.value.tiempoAlTranscurrido)).asMilliseconds() : 0
-	cronometro.value.tiempoTranscurrido += duracionTramoAnterior
+	cronometro.value.tiempoCronometrado += duracionTramoAnterior
 	cronometro.value.tiempoAlTranscurrido = ahora
 
 	// Seguir cronometrando
-	// window.requestAnimationFrame(cronometrar)
 	nextTick(() => window.requestAnimationFrame(cronometrar))
 }
 
@@ -129,16 +172,20 @@ function pausar() {
 
 	// Registrar tiempo hasta la pausa
 	const duracionJustoAntesDePausar = dayjs.duration(ahora.diff(cronometro.value.tiempoAlTranscurrido))
-	cronometro.value.tiempoTranscurrido += duracionJustoAntesDePausar.asMilliseconds()
+	cronometro.value.tiempoCronometrado += duracionJustoAntesDePausar.asMilliseconds()
 	cronometro.value.tiempoAlTranscurrido = ahora
 
-	console.log({
-		tiempoTranscurrido: cronometro.value.tiempoTranscurrido,
-		tiempoAlTranscurrido: cronometro.value.tiempoAlTranscurrido
-	})
+	// console.log({
+	// 	tiempoCronometrado: cronometro.value.tiempoCronometrado,
+	// 	tiempoAlTranscurrido: cronometro.value.tiempoAlTranscurrido
+	// })
 	// Pausar
 	cronometro.value.estaPausado = true
 	cronometro.value.tiempoAlPausar = ahora
+	cronometro.value.historial.push({
+		evento: 'pausa',
+		tiempo: ahora
+	})
 }
 
 function reanudar() {
@@ -147,7 +194,7 @@ function reanudar() {
 	const ahora = dayjs()
 
 	console.log('reanudar', {
-		tiempoTranscurrido: cronometro.value.tiempoTranscurrido,
+		tiempoCronometrado: cronometro.value.tiempoCronometrado,
 		tiempoAlTranscurrido: cronometro.value.tiempoAlTranscurrido
 	})
 
@@ -157,14 +204,17 @@ function reanudar() {
 	// Quitar pausa
 	cronometro.value.estaPausado = false
 	cronometro.value.tiempoAlPausar = null
+	cronometro.value.historial.push({
+		evento: 'reanudacion',
+		tiempo: ahora
+	})
 
 	
 	nextTick(() => {
-
-		console.log('reanudando', {
-			tiempoTranscurrido: cronometro.value.tiempoTranscurrido,
-			tiempoAlTranscurrido: cronometro.value.tiempoAlTranscurrido
-		})
+		// console.log('reanudando', {
+		// 	tiempoCronometrado: cronometro.value.tiempoCronometrado,
+		// 	tiempoAlTranscurrido: cronometro.value.tiempoAlTranscurrido
+		// })
 		window.requestAnimationFrame(cronometrar)
 	})
 }
@@ -183,19 +233,13 @@ async function terminar() {
 		id,
 		tiempoAlInicio: cronometro.value.tiempoAlInicio,
 		tiempoAlTerminar: cronometro.value.tiempoAlTerminar,
-		tiempoTranscurrido: cronometro.value.tiempoTranscurrido,
+		tiempoCronometrado: cronometro.value.tiempoCronometrado,
+		historial: cronometro.value.historial,
 	}
 	historialCronometrados.value[id] = porGuardar
 
-	console.log('%c Pre Reset del cronometro', 'color: orange', JSON.parse(JSON.stringify(cronometro.value)))
-	await nextTick()
 	// Reset del cronometro
-
-	console.log('%c Reset del cronometro', 'color: yellow', JSON.parse(JSON.stringify(cronometro.value)))
 	cronometro.value = nuevoCronometro()
-	await nextTick()
-	await nextTick()
-	console.log('%c cronometro reseteado', 'color: blue', JSON.parse(JSON.stringify(cronometro.value)))
 }
 
 onMounted(() => {

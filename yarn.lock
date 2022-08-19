@@ -450,12 +450,75 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@iconify-json/akar-icons@npm:^1.1.8":
+  version: 1.1.8
+  resolution: "@iconify-json/akar-icons@npm:1.1.8"
+  dependencies:
+    "@iconify/types": "*"
+  checksum: 74e2027ce00c107d30a445ff6c0100efab42667b01bbdb58dc1c9d3f6f8b7ec4309114501c202a367d2c9e2b0c5a69c6912f5f38dc974639212cb024d9870b6c
+  languageName: node
+  linkType: hard
+
+"@iconify-json/arcticons@npm:^1.1.24":
+  version: 1.1.24
+  resolution: "@iconify-json/arcticons@npm:1.1.24"
+  dependencies:
+    "@iconify/types": "*"
+  checksum: f95509ca89cfe92176420dccbd39ca98bd5dbfc3271d203343c9154b89154cd31e4d4985f3ac5939850126c5faa0a0ff57f5f78fe07ae69e69896dc9015ea418
+  languageName: node
+  linkType: hard
+
+"@iconify-json/carbon@npm:^1.1.7":
+  version: 1.1.7
+  resolution: "@iconify-json/carbon@npm:1.1.7"
+  dependencies:
+    "@iconify/types": "*"
+  checksum: 449d1597108c9d140cf076fde297a5608ffb0aa45340d4276195f35cfc634e654f837dc307c3f2850bb0e31eab7e78424516b52fe112d00a0904af5a2eb98ae6
+  languageName: node
+  linkType: hard
+
+"@iconify-json/icon-park-twotone@npm:^1.1.3":
+  version: 1.1.3
+  resolution: "@iconify-json/icon-park-twotone@npm:1.1.3"
+  dependencies:
+    "@iconify/types": "*"
+  checksum: da2073bccff3e011ea9bb8d9f1336f8f0e04cf8b2c826acb8ac4334f1335be86e6eddc33f467fc6f4cbb89dda232d93e02cf5d7bec4b4cafc5f8c89d6ea2e8b0
+  languageName: node
+  linkType: hard
+
+"@iconify-json/line-md@npm:^1.1.14":
+  version: 1.1.14
+  resolution: "@iconify-json/line-md@npm:1.1.14"
+  dependencies:
+    "@iconify/types": "*"
+  checksum: df9a831042ebe3b199328970c71be741b230099351f6b73a12fcfb29925fa02376446824e7b54bb3f3258cf2b985dcbb1a85956a72990e718791ac04f943db1b
+  languageName: node
+  linkType: hard
+
 "@iconify-json/mdi@npm:^1.1.30":
   version: 1.1.30
   resolution: "@iconify-json/mdi@npm:1.1.30"
   dependencies:
     "@iconify/types": "*"
   checksum: ea88e3526f5a478aa8684ad67c41e6d34e0f44e0b72a88f7eb46f5379b0189a61370f872d019bdc4058ccf2cbd93f9e76fb3db2ee725777eeba748b1f6623e0d
+  languageName: node
+  linkType: hard
+
+"@iconify-json/pixelarticons@npm:^1.1.3":
+  version: 1.1.3
+  resolution: "@iconify-json/pixelarticons@npm:1.1.3"
+  dependencies:
+    "@iconify/types": "*"
+  checksum: b701d067d25509ef0fdc5bf1f2c09630f62c5fe49ff77bb327e16e8e5ae3e2a386a7557047d552d7c1194e3899d4a434d7606d21ca5ed9a45fb4a3f4dfe9acee
+  languageName: node
+  linkType: hard
+
+"@iconify-json/system-uicons@npm:^1.1.4":
+  version: 1.1.4
+  resolution: "@iconify-json/system-uicons@npm:1.1.4"
+  dependencies:
+    "@iconify/types": "*"
+  checksum: f0c3f351300464e1edae2a8dfc0e12adcffc99553bd02cf9abab6fc8ff29442f5de8a017d53f9727be15312c02b20072f6e4cc1434689a80cdebb613c3b51657
   languageName: node
   linkType: hard
 
@@ -6016,7 +6079,15 @@ __metadata:
   resolution: "root-workspace-0b6124@workspace:."
   dependencies:
     "@ant-design/icons-vue": ^6.1.0
+    "@iconify-json/akar-icons": ^1.1.8
+    "@iconify-json/arcticons": ^1.1.24
+    "@iconify-json/carbon": ^1.1.7
+    "@iconify-json/icon-park-twotone": ^1.1.3
+    "@iconify-json/line-md": ^1.1.14
     "@iconify-json/mdi": ^1.1.30
+    "@iconify-json/pixelarticons": ^1.1.3
+    "@iconify-json/system-uicons": ^1.1.4
+    "@iconify/types": ^1.1.0
     "@types/lodash": ^4.14.182
     ant-design-vue: 3.2.10
     axios: ^0.27.2
