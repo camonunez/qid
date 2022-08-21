@@ -18,6 +18,7 @@ declare module '@vue/runtime-core' {
     ICarbonChevronRight: typeof import('~icons/carbon/chevron-right')['default']
     ICarbonChevronUp: typeof import('~icons/carbon/chevron-up')['default']
     ICarbonForecastLightning: typeof import('~icons/carbon/forecast-lightning')['default']
+    ICarbonPauseOutlineFilled: typeof import('~icons/carbon/pause-outline-filled')['default']
     IIconParkTwotoneReplayMusic: typeof import('~icons/icon-park-twotone/replay-music')['default']
     IIconParkTwotoneRest: typeof import('~icons/icon-park-twotone/rest')['default']
     IIconParkTwotoneResting: typeof import('~icons/icon-park-twotone/resting')['default']

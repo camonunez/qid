@@ -1,7 +1,5 @@
 <template lang="pug">
-//- .flex.jcc.aic.minh100vh
-.anchoWrapper.minh100vh
-	b Reloj
+div
 	NuxtChild
 
 </template>

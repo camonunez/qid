@@ -8,14 +8,30 @@
 		h2 Countdown
 		//- #over(style="display: none") Time is over
 
-		div tiempoCronometrado {{tiempoCronometrado.format('HH:mm:ss SSS')}}
-		div typeof tiempoCronometrado {{typeof tiempoCronometrado}}
+		.flex.aic.radio.cajaCronometro
+			//- .icoBoton.fz2rem.lh1
+				i-akar-icons-circle-minus-fill
+			.cronometro.valor.radio.flex.jcc.aifs.p1rem
+				.fz8rem.fontDigital {{tiempoCronometrado.format('mm:ss')}}
+				.fz2rem.fontDigital.ml1rem {{tiempoCronometrado.format('SSS')}}
 
 		.p2rem
-			button(@click="cronometrar" :disabled="cronometro.estaIniciado && !cronometro.estaTerminado") Iniciar
-			button(@click="pausar" :disabled="cronometro.estaTerminado || cronometro.estaPausado") Pausar
-			button(@click="reanudar" :disabled="!cronometro.estaPausado") Reanudar
-			button(@click="terminar" :disabled="cronometro.estaTerminado") Terminar 
+			button(@mousedown="cronometrar" :disabled="cronometro.estaIniciado && !cronometro.estaTerminado")
+				.flex.ffcn.jcc.aic
+					i-pixelarticons-play.fz2rem
+					span.pt-02rem Iniciar
+			button(@click="pausar" :disabled="cronometro.estaTerminado || cronometro.estaPausado")
+				.flex.ffcn.jcc.aic
+					i-carbon-pause-outline-filled.fz2rem
+					span.pt-02rem Pausar
+			button(@click="reanudar" :disabled="!cronometro.estaPausado")
+				.flex.ffcn.jcc.aic
+					i-pixelarticons-pause.fz2rem
+					span.pt-02rem Reanudar
+			button(@click="terminar" :disabled="cronometro.estaTerminado")
+				.flex.ffcn.jcc.aic
+					i-pixelarticons-play.fz2rem
+					span.pt-02rem Terminar 
 
 	div
 		.pb2rem
@@ -247,4 +263,10 @@ onMounted(() => {
 })
 
 </script>
-<style lang="sass" scoped></style>
+<style lang="sass" scoped>
+@import '@/sass/comun'
+.cajaCronometro
+	background-color: #14151A
+	.cronometro
+		color: #FDDA00
+</style>
