@@ -1,0 +1,31 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"workbench.colorCustomizations": {
+			"activityBar.background": "#223843",
+			"titleBar.activeBackground": "#D77A61",
+			"titleBar.activeForeground": "#FFFFFF",
+			// "titleBar.activeForeground": "#8BB8A8",
+			// "activityBar.border": "#041a20",
+			// "activityBar.inactiveForeground": "#0f6078",
+			// "activityBar.activeBackground": "#0f6078",
+
+			// "sideBar.background": "#041a20",
+			// "sideBar.foreground": "#fff",
+			// "sideBar.dropBackground": "#69100a6e",
+			// "sideBarTitle.foreground": "#ffffff",
+			// "sideBar.border": "#041a20",
+			// "sideBarSectionHeader.foreground": "#ffffff",
+			// "sideBarSectionHeader.background": "#09303d",
+
+			// "editor.background": "#161616",
+			"statusBar.background": "#000",
+			"terminal.background": "#111"
+		},
+		"window.title": "qID ${separator}${activeEditorShort}",
+	}
+}

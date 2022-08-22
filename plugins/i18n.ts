@@ -40,6 +40,8 @@ export const rosetta = <SetDeTraducciones extends Rosetta>(setTraducciones: SetD
 		traduccionID: TraducirID,
 		variables?: Variables
 	) {
+		try {
+
 		const idiomaActivo = configuracion.idiomaActivo
 
 		const traducciones = setTraducciones[traduccionID]
@@ -47,16 +49,20 @@ export const rosetta = <SetDeTraducciones extends Rosetta>(setTraducciones: SetD
 
 		if (variables === undefined) return traducido
 
-		console.log('traducido', traducido)
+		// console.log('traducido', traducido)
 		let resultado = traducido
 
 		for (const variableID in variables) {
-			console.log('variableID', variableID)
+			// console.log('variableID', variableID)
 			const reemplazante = variables[variableID]
 			resultado = resultado.replace(`{{${variableID}}}`, `${reemplazante}`)
 		}
 
 		return resultado
+		} catch (e) {
+			console.log('error', e)
+			return '🪲'
+		}
 	}
 	return supertraducir
 }

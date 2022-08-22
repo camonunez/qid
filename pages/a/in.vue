@@ -1,11 +1,11 @@
 <template lang="pug">
-.flex.jcc.aic.minh100vh
+.rootIn.flex.jcc.aic.minh100vh
 
 	div(v-if="$usuario === [2]") Cargando...
 	div(v-if="$usuario === null") Cargando...
 	div(v-else-if="$usuario === false") 
 		b No conectado
-		//- SesionIngreso
+		SesionIngreso
 	NuxtChild(v-else)
 	
 
@@ -32,3 +32,7 @@ useHead({
 	title: 'In'
 })
 </script>
+<style lang="sass" scoped>
+.rootIn
+	background-color: #333
+</style>

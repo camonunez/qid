@@ -4,8 +4,8 @@
 	.anchoComun
 		h1 Hola
 
-		NuxtLink.boton(to="/timer") Timer
-		//- NuxtLink.boton(to="/a") App
+		//- NuxtLink.boton(to="/timer") Timer
+		NuxtLink.boton(to="/a") App
 		//- NuxtLink.boton.primario(@click="log('test;')") test
 	
 

@@ -1,5 +1,4 @@
 <template lang="pug">
-//- .flex.jcc.aic.minh100vh
 .anchoWrapper.minh100vh
 
 	.my2rem

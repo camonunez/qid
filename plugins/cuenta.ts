@@ -314,7 +314,7 @@ export default defineNuxtPlugin(nuxtApp => {
 
 		// console.log('nuxtApp.vueApp', nuxtApp.vueApp)
 		nuxtApp.hook('app:mounted', () => {
-			console.log('app:mounted')
+			// console.log('app:mounted')
 			cuentaAPI.init()
 		})
 		return {

@@ -5,62 +5,47 @@
 		SesionUsuarioConectado.usuarioConectado(v-if="$usuario" key="conectado")
 
 		// INGRESO
-		.formIngreso(v-else-if="modoActivo === 'ingreso'" key="ingreso"
-			:model="cuenta"
-			layout="vertical"
-			ref="formIngreso"
-			:rules="reglasIngreso")
+		.formIngreso(v-else-if="modoActivo === 'ingreso'" key="ingreso" ref="formIngreso")
 
-			h1.titulo {{ $t('ingresaATuCuenta') }}
+			h1.titulo {{ i18n('ingresaATuCuenta') }}
 
-			.formElemento(prop="email" :label="$t('correo')"
-				:help="emailsNoExistentes.includes(cuenta.email) ? 'No registrado' : ''"
-				:validateStatus="emailsNoExistentes.includes(cuenta.email) ? 'error' : ''")
-				input(
-					v-enfocar
-					v-model="cuenta.email"
-					:placeholder="$t('correo')"
-					type="email"
-					@keyup.enter="pasarA($refs.iPassword)"
-					autocomplete="email"
-				)
-				.icono.m.correo
+			.formElemento.mb2rem
 
-			.formElemento(prop="password"
-				:help="passIncorrectos.includes(cuenta.password) ? $t('passIncorrecto') : ''"
-				:validateStatus="passIncorrectos.includes(cuenta.password) ? 'error' : ''")
+				UiInput(enfocar v-model="cuenta.email" :etiqueta="i18n('correo')" :placeholder="i18n('correo')" type="email")
+					template(v-slot:preIcono)
+						i-carbon-email
 
-				//- div.flex.jcsb(slot="label")
-					label {{$t('contrasena')}}
-					a.passOlvidada(@click="modoActivo = 'recuperarPass'") Olvidada?
+			.formElemento
 
-				a-input-password(
-					ref="iPassword"
-					v-model="cuenta.password"
-					:placeholder="$t('contrasena')"
-					autocomplete="password"
-					@keyup.enter="procesarIngreso"
-				)
-				.icono.m.llave
+				UiInput(enfocar v-model="cuenta.password" :etiqueta="i18n('contrasena')" :placeholder="i18n('contrasena')" :type="mostrarPass ? 'text' : 'password'")
+					template(v-slot:preIcono)
+						i-carbon-password
+					template(v-slot:postIcono)
+						i-carbon-view-off(v-if="mostrarPass" @click="mostrarPass = false")
+						i-carbon-view(v-else @click="mostrarPass = true")
 
 			.accion
-				a-form-model-item
-					a-button.anchoComun(type="primary" block
-						@click="procesarIngreso"
+
+				div.flex.jcsb(slot="label")
+					label {{i18n('contrasena')}}
+					a.passOlvidada(@click="modoActivo = 'recuperarPass'") Olvidada?
+				.a-form-model-item
+					button.boton.anchoComun.primary(block
+						@click="ingresar"
 						:loading="conectando"
 						icon="login"
 						:disabled="passIncorrectos.includes(cuenta.password)"
-						) {{ conectando ? $t('conectando') : $t('ingresar') }}
-				
-				//- a-form-model-item
+						) {{ conectando ? i18n('conectando') : i18n('ingresar') }}
+
+				//- .a-form-model-item
 					.cambioModo
-						| {{$t('eresNuevo')}}
-						a(@click="modoActivo = 'registro'") {{" "}}{{$t('registrate')}}
+						| {{i18n('eresNuevo')}}
+						a(@click="modoActivo = 'registro'") {{" "}}{{i18n('registrate')}}
 
 					//a.passOlvidada(@click="modoActivo = 'recuperarPass'") Olvidada?
-				//a-form-model-item
-					.cambioModo
-						a(@click="modoActivo = 'recuperarPass'") No tienes u olvidaste tu contraseña?
+					//.a-form-model-item
+						.cambioModo
+							a(@click="modoActivo = 'recuperarPass'") No tienes u olvidaste tu contraseña?
 
 
 
@@ -71,35 +56,35 @@
 			ref="formRegistro"
 			:rules="reglasRegistro")
 
-			h1.titulo {{ $t('creaTuCuenta') }}
+			h1.titulo {{ i18n('creaTuCuenta') }}
 
 			.grupoCampos
 
-				.formElemento(prop="nombre" :label="$t('nombre')")
-					input(v-enfocar v-model="cuenta.nombre" :placeholder="$t('nombre')" autocomplete="given-name")
+				.formElemento(prop="nombre" :label="i18n('nombre')")
+					input(v-focus v-model="cuenta.nombre" :placeholder="i18n('nombre')" autocomplete="given-name")
 
-				.formElemento(prop="apellido" :label="$t('apellido')")
-					input(v-model="cuenta.apellido" :placeholder="$t('apellido')" autocomplete="family-name")
+				.formElemento(prop="apellido" :label="i18n('apellido')")
+					input(v-model="cuenta.apellido" :placeholder="i18n('apellido')" autocomplete="family-name")
 
-			.formElemento(prop="email" :label="$t('correo')")
-				input(v-model="cuenta.email" :placeholder="$t('correo')" type="email" autocomplete="email")
-				.icono.m.mail
+			.formElemento(prop="email" :label="i18n('correo')")
+				input(v-model="cuenta.email" :placeholder="i18n('correo')" type="email" autocomplete="email")
+				i-carbon-email
 
-			.formElemento(prop="password" :label="$t('contrasena')")
+			.formElemento(prop="password" :label="i18n('contrasena')")
 				input(type="password"
 					v-model="cuenta.password" 
-					:placeholder="$t('contrasena')"
+					:placeholder="i18n('contrasena')"
 					autocomplete="new-password")
-				.icono.m.llave
+				i-carbon-password
 
 			.accion
 				.formElemento
-					a-button.enSesion.anchoComun(type="primary" @click="procesarRegistro" :loading="conectando")
-						| {{ conectando ? $t('creandoCuenta') : $t('crearla') }}
+					button.boton.primario.enSesion.anchoComun(@click="registrar" :loading="conectando")
+						| {{ conectando ? i18n('creandoCuenta') : i18n('crearla') }}
 				.formElemento
 					.cambioModo
-						| {{$t('yaTienes')}}
-						a(@click="modoActivo = 'ingreso'") {{" "}}{{$t('ingresa')}}
+						| {{ i18n('yaTienes') }}
+						a(@click="modoActivo = 'ingreso'") {{ " " }}{{ i18n('ingresa') }}
 
 
 		// RECUPERACION PASSWORD
@@ -111,226 +96,310 @@
 
 	//- .sinConexion.flex.aic(v-if="$inConexion" @click="$cuenta.ping()")
 	//- 	.oicono.enchufe.m
-	//- 	.texto {{$t('errorDeRed')}}
+	//- 	.texto {{i18n('errorDeRed')}}
 </template>
-<script setup>
-const { $usuario } = useNuxtApp()
+<script setup lang="ts">
+import { useNuxtApp } from 'nuxt/app'
+import { ref, reactive, computed, watch } from 'vue'
 
-</script>
-<script>
-export default {
-	name: 'Ingreso',
-	directives: {
-		enfocar: {
-			inserted(el) {
-				el.focus()
-			}
-		}
+import { rosetta } from '@/plugins/i18n'
+import { z } from 'zod'
+
+// Plugins
+const { $usuario, $consolo, $cuenta } = useNuxtApp()
+
+
+// i18n
+const i18n = rosetta({
+	// FORMULARIO
+	// ingreso
+	ingresaATuCuenta: {
+		es: 'Ingresa a tu cuenta',
+		en: 'Sign in to your account'
 	},
-	props: {
-		modo: { type: String, required: false, default: 'ingreso' }
+	correo: {
+		es: 'Correo',
+		en: 'Email'
 	},
-	data() {
-		// console.log('IGRESO DATA this.modo', this.modo)
-
-		let modoActivo = 'ingreso'
-		if (this.modo && 'ingreso registro'.split(' ').includes(this.modo)) {
-			modoActivo = this.modo
-		}
-
-		const cuenta = {
-			nombre: '',
-			apellido: '',
-			email: '',
-			password: '',
-			confirmacion: ''
-		}
-
-		return {
-			modoActivo,
-			// modoActivo: 'recuperarPass',
-			conectando: false,
-			error: null,
-
-			// cuenta: { nombre: '', apellido: '', email: '', password: '', confirmacion: '' },
-			cuenta,
-
-			emailsNoExistentes: [],
-			passIncorrectos: []
-		}
+	contrasena: {
+		es: 'Contraseña',
+		en: 'Password'
 	},
-	computed: {
-		reglasIngreso() {
-			return {
-				email: [
-					{ type: 'email', message: this.$t('emailInvalido'), trigger: 'blur' },
-					{ required: true, message: this.$t('ingresaTuEmail') }
-				],
-				password: [
-					{
-						required: true,
-						message: this.$t('noOlvidesEsto'),
-						trigger: 'blur'
-					},
-					{
-						type: 'string',
-						min: 1,
-						message: this.$t('muyCorto'),
-						trigger: 'blur'
-					}
-				]
-			}
-		},
-		reglasRegistro() {
-			return {
-				nombre: [{ required: true, message: '*', whitespace: true }],
-				apellido: [{ required: true, message: '*', whitespace: true }],
-
-				email: [
-					{ type: 'email', message: this.$t('emailInvalido'), trigger: 'blur' },
-					{ required: true, message: this.$t('ingresaTuEmail') }
-				],
-				password: [
-					{
-						required: true,
-						message: this.$t('noOlvidesEsto'),
-						trigger: 'blur'
-					},
-					{
-						type: 'string',
-						min: 1,
-						message: this.$t('muyCorto'),
-						trigger: 'blur'
-					}
-				]
-			}
-		}
+	conectando: {
+		es: 'Conectando',
+		en: 'Connecting'
 	},
-	watch: {
-		'cuenta.email'() {
-			this.passIncorrectos = []
-		}
+	ingresar: {
+		es: 'Ingresar',
+		en: 'Sign in'
 	},
-	methods: {
-		procesarIngreso() {
-			console.log('procesarIngreso')
-			this.$refs.formIngreso.validate(valid => {
-				if (valid) {
-					// const c = this.cuenta
-					console.info('formulario valido')
-					const { email, password } = this.cuenta
-					this.ingresar({ email, password })
-				} else {
-					console.warn('error submit!!')
-					return false
-				}
-			})
-		},
-		async ingresar({ email, password }) {
-			const _ = this._
-			this.$consolo.log('ingresar', { email, password })
-			this.conectando = true
-			try {
-				const r = await this.$cuenta.ingresar(email, password)
-				this.$consolo.log('r', r)
-
-				if (!r.ok) {
-					if (_.get(r, 'error.email') === 'noExiste') {
-						// const vm = this
-						// this.$info({
-						// 	title: vm.$t('correoNoRegistrado'),
-						// 	content: vm.$t('emailSinCuenta'),
-						// 	width: 'auto',
-						// 	okText: vm.$t('registrarme'),
-						// 	onOk () { vm.modoActivo = 'registro' },
-						// 	closable: true,
-						// 	maskClosable: true,
-						// 	cancelText: vm.$t('cancelar'),
-						// 	centered: true
-						// })
-						this.emailsNoExistentes = [...this.emailsNoExistentes, email]
-					} else if (_.get(r, 'error.password') === 'incorrecto') {
-						this.passIncorrectos = [...this.passIncorrectos, password]
-					}
-				}
-			} catch (e) {
-				this.conectando = false
-			}
-			this.conectando = false
-		},
-
-		procesarRegistro() {
-			console.log('procesarRegistro')
-			this.$refs.formRegistro.validate(valid => {
-				if (valid) {
-					const c = this.cuenta
-					this.registrar(c.nombre, c.apellido, c.email, c.password)
-				} else {
-					console.warn('error submit!!')
-					return false
-				}
-			})
-		},
-		async registrar(nombre, apellido, email, pass) {
-			this.$consolo.log('registrar', { nombre, apellido, email, pass })
-			this.conectando = true
-			try {
-				await this.$cuenta.crearCuenta(nombre, apellido, email, pass)
-			} catch (e) {
-				this.$consolo.error('registrar', e)
-				this.conectando = false
-			}
-			this.conectando = false
-		},
-
-		resetRegistro() {
-			this.$refs.formRegistro.resetFields()
-		},
-
-		pasarA(el) {
-			el.focus()
-		}
+	passIncorrecto: {
+		es: 'Incorrecto', en: 'Incorrect'
 	},
-	traducciones: {
-		// FORMULARIO
-		// ingreso
-		ingresaATuCuenta: { es: 'Ingresa a tu cuenta' },
-		correo: { es: 'Correo' },
-		contrasena: { es: 'Contraseña' },
-		conectando: { es: 'Conectando' },
-		ingresar: { es: 'Ingresar' },
-		passIncorrecto: { es: 'Incorrecto' },
-		correoNoRegistrado: { es: 'Correo no registrado' },
-		emailSinCuenta: { es: 'El email ingresado no tiene cuenta' },
-		// registro
-		creaTuCuenta: { es: 'Crea tu cuenta' },
-		nombre: { es: 'Nombre' },
-		apellido: { es: 'Apellido' },
-		creandoCuenta: { es: 'Creando cuenta' },
-		crearla: { es: 'Crearla' },
+	correoNoRegistrado: {
+		es: 'Correo no registrado',
+		en: 'Email not registered'
+	},
+	emailSinCuenta: {
+		es: 'El email ingresado no tiene cuenta',
+		en: 'The email entered does not have an account'
+	},
+	// registro
+	creaTuCuenta: {
+		es: 'Crea tu cuenta',
+		en: 'Create your account'
+	},
+	nombre: {
+		es: 'Nombre',
+		en: 'Name'
+	},
+	apellido: {
+		es: 'Apellido',
+		en: 'Last name'
+	},
+	creandoCuenta: {
+		es: 'Creando cuenta',
+		en: 'Creating account'
+	},
+	crearla: {
+		es: 'Crearla',
+		en: 'Create it'
+	},
 
-		// acciones
-		yaTienes: { es: 'Ya tienes una cuenta?' },
-		ingresa: { es: 'Ingresa' },
-		eresNuevo: { es: 'Eres nuevo aquí?' },
-		cancelar: { es: 'Cancelar' },
-		registrate: { es: 'Regístrate' },
-		registrarme: { es: 'Registrarme' },
-		confirmarCambioPass: { es: 'Confirmar cambio' },
-		operacionNoSolicitada: { es: 'Operación no solicitada' },
+	// acciones
+	yaTienes: {
+		es: 'Ya tienes una cuenta?',
+		en: 'Already have an account?'
+	},
+	ingresa: {
+		es: 'Ingresa',
+		en: 'Sign in'
+	},
+	eresNuevo: {
+		es: 'Eres nuevo aquí?',
+		en: 'Are you new here?'
+	},
+	cancelar: {
+		es: 'Cancelar',
+		en: 'Cancel'
+	},
+	registrate: {
+		es: 'Regístrate',
+		en: 'Register'
+	},
+	registrarme: {
+		es: 'Registrarme',
+		en: 'Register me'
+	},
+	confirmarCambioPass: {
+		es: 'Confirmar cambio',
+		en: 'Confirm change'
+	},
+	operacionNoSolicitada: {
+		es: 'Operación no solicitada',
+		en: 'Operation not requested'
+	},
 
-		// VALIDACION
-		falta: { es: 'Falta' },
-		// ingreso
-		emailInvalido: { es: 'E-mail inválido' },
-		ingresaTuEmail: { es: 'Ingresa tu e-mail' },
-		muyCorto: { es: 'Muy corto' },
-		// registro
-		noOlvidesEsto: { es: 'No olvides esto' },
+	// VALIDACION
+	falta: {
+		es: 'Falta',
+		en: 'Missing'
+	},
+	// ingreso
+	emailInvalido: {
+		es: 'E-mail inválido',
+		en: 'Invalid email'
+	},
+	ingresaTuEmail: {
+		es: 'Ingresa tu e-mail',
+		en: 'Enter your email'
+	},
+	muyCorto: {
+		es: 'Muy corto',
+		en: 'Too short',
+	},
+	// registro
+	nombreInvalido: {
+		es: 'Nombre inválido',
+		en: 'Invalid name',
+	},
+	apellidoInvalido: {
+		es: 'Apellido inválido',
+		en: 'Invalid surname',
+	},
+	noOlvidesEsto: {
+		es: 'No olvides esto',
+		en: 'Don\'t forget this',
+	},
 
-		errorDeRed: { es: 'Error de red', en: 'Network error', pt: 'Error de red' }
+	errorDeRed: { es: 'Error de red', en: 'Network error', pt: 'Error de red' }
+})
+
+// Directives
+const vFocus = {
+	mounted: (el: HTMLElement) => el && el.focus()
+}
+
+// Props
+const { modo = 'ingreso' } = defineProps<{
+	modo?: 'ingreso' | 'registro' | 'recuperarPass'
+}>()
+
+// Refs
+const iPassword = ref(null)
+
+// Data
+let modoActivo = ref(modo)
+let mostrarPass = ref<boolean>(false)
+let conectando = ref<boolean>(false)
+const cuenta = reactive({
+	nombre: '',
+	apellido: '',
+	email: '',
+	password: '',
+	confirmacion: ''
+})
+
+const emailsNoExistentes = reactive<string[]>([])
+const passIncorrectos = reactive<string[]>([])
+
+const Email = z.string().email({})
+const Ingreso = z.object({
+	email: Email,
+	password: z.string().min(6)
+})
+
+type Ingreso = z.infer<typeof Ingreso>
+
+const Registro = z.object({
+	nombre: z.string({
+		required_error: "Name is required",
+		invalid_type_error: "Name must be a string",
+	}),
+	apellido: z.string(),
+	email: Email,
+	password: z.string().min(6)
+})
+
+type Registro = z.infer<typeof Registro>
+
+const reglasIngreso = {
+	email: [
+		{ type: 'email', message: i18n('emailInvalido'), trigger: 'blur' },
+		{ required: true, message: i18n('ingresaTuEmail') }
+	],
+	password: [
+		{
+			required: true,
+			message: i18n('noOlvidesEsto'),
+			trigger: 'blur'
+		},
+		{
+			type: 'string',
+			min: 1,
+			message: i18n('muyCorto'),
+			trigger: 'blur'
+		}
+	]
+}
+
+const reglasRegistro = {
+	nombre: [{ required: true, message: '*', whitespace: true }],
+	apellido: [{ required: true, message: '*', whitespace: true }],
+
+	email: [
+		{ type: 'email', message: i18n('emailInvalido'), trigger: 'blur' },
+		{ required: true, message: i18n('ingresaTuEmail') }
+	],
+	password: [
+		{
+			required: true,
+			message: i18n('noOlvidesEsto'),
+			trigger: 'blur'
+		},
+		{
+			type: 'string',
+			min: 1,
+			message: i18n('muyCorto'),
+			trigger: 'blur'
+		}
+	]
+}
+
+watch(computed(() => cuenta.email), () => {
+	// emailsNoExistentes.splice(0)
+	passIncorrectos.splice(0)
+})
+
+
+
+// Methods
+function enfocarEn(el: HTMLElement | null) {
+	el && el.focus()
+}
+
+async function ingresar() {
+	try {
+		const r = Ingreso.safeParse(cuenta)
+		if (!r.success) {
+			console.log('error', r.error)
+			return
+		}
+		const { email, password } = r.data
+		$consolo.log('ingresar', { email, password })
+		conectando.value = true
+		const s = await $cuenta.ingresar(email, password)
+		$consolo.log('r', s)
+
+		if (!s.ok) {
+			// tratarErrorDeIngreso(r.error)
+			console.error(r)
+		}
+	} catch (e) {
+		console.error('caught', e)
+		conectando.value = false
+	} finally {
+		conectando.value = false
 	}
 }
+
+// function tratarErrorDeIngreso(error) {
+// 	console.log('tratarErrorDeIngreso')
+// 	const r = Ingreso.safeParse(cuenta)
+// 	if (!r.success) {
+// 		console.log('error', r.error)
+// 		return
+// 	}
+// 	ingresar(r.data)
+// 	return r.data
+// }
+
+async function registrar() {
+	try {
+		const r = Registro.safeParse(cuenta)
+		if (!r.success) {
+			console.log('error', r.error)
+			return
+		}
+		conectando.value = true
+		const { nombre, apellido, email, password } = r.data
+		$consolo.log('registrar', { nombre, apellido, email, password })
+		await $cuenta.crearCuenta(nombre, apellido, email, password)
+	} catch (e) {
+		$consolo.error('registrar', e)
+	} finally {
+		conectando.value = false
+	}
+}
+
+function resetRegistro() {
+	cuenta.nombre = ''
+	cuenta.apellido = ''
+	cuenta.email = ''
+	cuenta.password = ''
+	cuenta.confirmacion = ''
+}
+
 </script>
 <style lang="sass" scoped>
 @import "~/sass/comun"
@@ -338,7 +407,6 @@ export default {
 	width: 100%
 	max-width: 100%
 	position: relative
-	z-index: 9
 	.formIngreso,
 	.formRegistro,
 	.usuarioConectado,
@@ -380,33 +448,8 @@ export default {
 					border-bottom-left-radius: 0
 
 
-	::v-deep
-		.ant-form-item-label
-			.ant-form-item-required::before
-				display: none
 
-	.sinConexion
-		margin-top: 1em
-		color: $error
-		text-align: center
-		display: flex
-		justify-content: center
-		.oicono
-			margin-right: .5em
-
-
-/*Errores de formulario*/
-.ant-form-explain, .ant-form-extra
-		// font-size: $font-size-xs !important
-.ant-form-vertical .ant-form-explain
-	// font-size: $font-size-xs !important
-.has-error .ant-form-explain, .has-error .ant-form-split
-	color: $error
-	// font-size: $font-size-xs !important
-	letter-spacing: .5px !important
-
-
-.rootFormIngreso::v-deep
+.rootFormIngreso
 	input:-webkit-autofill,
 	input:-webkit-autofill:hover,
 	input:-webkit-autofill:focus,
