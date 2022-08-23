@@ -9,7 +9,7 @@
 			slot(name="preIcono")
 
 		input.fa11(v-model="value" v-bind="$attrs" 
-			v-focus="attrs.enfocar? true : false"
+			vFocus="attrs.enfocar? true : false"
 			:class="{ preIcono: $slots.preIcono, postIcono: $slots.postIcono }")
 
 		.zonaIcono.postIcono.fa00.flex.jcc.aic(v-if="$slots.postIcono")

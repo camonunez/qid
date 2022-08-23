@@ -9,22 +9,26 @@
 			slot(name="preIcono")
 
 		.inputs.flex.jcc.aic
-			input.inputUnDigito(:value="codigo0" @keyup="keyup(0, $event)"
+			input.inputUnDigito(:value="codigo0" 
+				@keyup="keyup(0, $event)" @paste="pegarCodigo"
 				ref="campoCodigo0"
 				type="text" inputmode="numeric" placeholder="*"
 				maxlength="1" pattern="\d" min="0" max="9" step="1")
 
-			input.inputUnDigito(:value="codigo1" @keyup="keyup(1, $event)"
+			input.inputUnDigito(:value="codigo1" 
+				@keyup="keyup(1, $event)" @paste="pegarCodigo"
 				ref="campoCodigo1"
 				type="text" inputmode="numeric" placeholder="*"
 				maxlength="1" pattern="\d" min="0" max="9" step="1")
 
-			input.inputUnDigito(:value="codigo2" @keyup="keyup(2, $event)"
+			input.inputUnDigito(:value="codigo2" 
+				@keyup="keyup(2, $event)" @paste="pegarCodigo"
 				ref="campoCodigo2"
 				type="text" inputmode="numeric" placeholder="*"
 				maxlength="1" pattern="\d" min="0" max="9" step="1")
 
-			input.inputUnDigito(:value="codigo3" @keyup="keyup(3, $event)"
+			input.inputUnDigito(:value="codigo3" 
+				@keyup="keyup(3, $event)" @paste="pegarCodigo"
 				ref="campoCodigo3"
 				type="text" inputmode="numeric" placeholder="*"
 				maxlength="1" pattern="\d" min="0" max="9" step="1")
@@ -136,6 +140,25 @@ function keyup(index: number, event: KeyboardEvent) {
 
 	// $consolo.log(`cambio ${index} ${value}`)
 
+}
+
+function pegarCodigo (event: ClipboardEvent) {
+	$consolo.log(`pegarCodigo event`, event)
+	const clipboardData = event.clipboardData
+	if (!clipboardData) {
+		return
+	}
+	const text = clipboardData.getData('text')
+	$consolo.log(`pegarCodigo text`, text)
+	const codigo = EncadenadorDeCodigo.safeParse(text)
+	$consolo.log(`pegarCodigo codigo`, codigo)
+	if (codigo.success) {
+		const tupla = codigo.data
+		codigo0.value = tupla[0]
+		codigo1.value = tupla[1]
+		codigo2.value = tupla[2]
+		codigo3.value = tupla[3]
+	}
 }
 function cambio(index: number, event: Event) {
 	$consolo.log(`cambio ${index}, event`, event)

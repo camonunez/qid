@@ -22,8 +22,8 @@
 					template(v-slot:preIcono)
 						i-carbon-password
 					template(v-slot:postIcono)
-						i-carbon-view-off(v-if="mostrarPass" @click="mostrarPass = false")
-						i-carbon-view(v-else @click="mostrarPass = true")
+						i-carbon-view(v-if="mostrarPass" @click="mostrarPass = false")
+						i-carbon-view-off(v-else @click="mostrarPass = true")
 
 			.accion
 
@@ -87,8 +87,8 @@
 					template(v-slot:preIcono)
 						i-carbon-password
 					template(v-slot:postIcono)
-						i-carbon-view-off(v-if="mostrarPass" @click="mostrarPass = false")
-						i-carbon-view(v-else @click="mostrarPass = true")
+						i-carbon-view(v-if="mostrarPass" @click="mostrarPass = false")
+						i-carbon-view-off(v-else @click="mostrarPass = true")
 
 			.accion
 				.formElemento
