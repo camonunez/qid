@@ -2,33 +2,45 @@
 .rootUsuarioConectado
 	transition(mode="out-in" :duration="300")
 
-		a-form-model.formulario(
+		form.formulario(
 			layout="vertical")
 
-			h1.titulo {{ $t('hola') }}
+			h1.titulo {{ i18n('hola') }}
 
 			.contenido
-				a-form-model-item
+				.formElemento
 					.avatarImagen.con(v-if="$usuario.avatar")
 						.img(:style="`background-image: url(${$usuario.avatar})`")
 					.avatarImagen.sin(v-else)
 						.inicial {{$usuario.nombre[0]}}
-				a-form-model-item
+				.formElemento
 					.texto {{$usuario.nombre}} {{$usuario.apellido}}
 					.texto {{$usuario.email}}
-				a-form-model-item
-					a(@click="$cuenta.salir") {{$t('cerrarSesion')}}
+				.formElemento
+					a(@click="$cuenta.salir") {{i18n('cerrarSesion')}}
 
 </template>
-<script>
-export default {
-	name: 'UsuarioConectado',
-	methods: {},
-	traducciones: {
-		hola: { es: 'Hola!' },
-		cerrarSesion: { es: 'Cerrar sesión' }
+<script setup lang="ts">
+import { useNuxtApp } from 'nuxt/app'
+import { ref, reactive, computed, watch } from 'vue'
+
+import { rosetta } from '@/plugins/i18n'
+import { z } from 'zod'
+
+// Plugins
+const { $usuario, $cuenta } = useNuxtApp()
+// i18n
+const i18n = rosetta({
+	hola: {
+		es: 'Hola',
+		en: 'Hello'
+	},
+	cerrarSesion: {
+		es: 'Cerrar sesión',
+		en: 'Sign out'
 	}
-}
+})
+
 </script>
 <style lang="sass" scoped>
 @import "~/sass/comun"

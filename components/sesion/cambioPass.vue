@@ -3,161 +3,190 @@
 	transition(mode="out-in" :duration="300")
 
 		// CAMBIO PASSWORD
-		a-form-model.formulario(key="solicitarCambioPass"
-			:model="cuenta"
-			layout="vertical"
-			ref="formCambioPass"
-			:rules="reglasCambioPass")
+		form.formulario(key="solicitarCambioPass")
 
-			h1.titulo {{ $t('cambiaTuPass') }}
+			h1.titulo {{ i18n('cambiaTuPass') }}
 
 			.dn
 				input(type="text" autocomplete="username" :value="$usuario.email" readonly)
 
-			a-form-model-item(prop="pass"
-				:help="_.get(error, 'pass')"
-				:validateStatus="passIncorrectos.includes(cuenta.pass) ? 'error' : ''")
+			.formElemento
 
 				.flex.f11.jcsb(slot="label")
-					label {{$t('actualPass')}}
+					label {{ i18n('actualPass') }}
 					n-link.passOlvidada(to="/cuenta/recuperar-pass") Olvidada?
 
-				a-input-password(
-					ref="actualpass"
-					v-model="cuenta.pass"
-					:placeholder="$t('contrasena')"
-					autocomplete="current-password"
-					@keyup.enter="pasarA($refs.nuevoPass)"
-				)
-					a-icon(slot="prefix" type="key")
+				//- a-input-password(
+				//- 	ref="actualpass"
+				//- 	v-model="cuenta.password"
+				//- 	:placeholder="i18n('contrasena')"
+				//- 	autocomplete="current-password"
+				//- 	@keyup.enter="campoPassNuevo && campoPassNuevo.focus()"
+				//- )
+				//- 	a-icon(slot="prefix" type="key")
 
-			a-form-model-item(prop="nuevoPass" :label="$t('nuevoPass')")
 
-				a-input-password(
-					ref="nuevoPass"
-					v-model="cuenta.nuevoPass"
-					:placeholder="$t('nuevoPass')"
-					autocomplete="new-password"
-					@keyup.enter="procesarCambioPass"
-					)
-					a-icon(slot="prefix" type="key")
+				UiInput(ref="campoPassActual" 
+				v-model="cuenta.password" 
+				:etiqueta="i18n('actualPass')"
+				:placeholder="i18n('actualPass')"
+				:type="mostrarPass ? 'text' : 'password'"
+				autocomplete="current-password")
+					template(v-slot:preIcono)
+						i-carbon-password
+					template(v-slot:postIcono)
+						i-carbon-view-off(v-if="mostrarPass" @click="mostrarPass = false")
+						i-carbon-view(v-else @click="mostrarPass = true")
 
+			.formElemento(prop="passwordNuevo" :label="i18n('passwordNuevo')")
+
+				//- a-input-password(
+				//- 	ref="passwordNuevo"
+				//- 	v-model="cuenta.passwordNuevo"
+				//- 	:placeholder="i18n('passwordNuevo')"
+				//- 	autocomplete="new-password"
+				//- 	@keyup.enter="solicitarCambioPass"
+				//- 	)
+				//- 	a-icon(slot="prefix" type="key")
+
+				UiInput(ref="campoPassActual" 
+				v-model="cuenta.password" 
+				:etiqueta="i18n('passwordNuevo')"
+				:placeholder="i18n('passwordNuevo')"
+				:type="mostrarNuevoPass ? 'text' : 'password'"
+				autocomplete="new-password")
+					template(v-slot:preIcono)
+						i-carbon-password
+					template(v-slot:postIcono)
+						i-carbon-view-off(v-if="mostrarNuevoPass" @click="mostrarNuevoPass = false")
+						i-carbon-view(v-else @click="mostrarNuevoPass = true")
 			.accion
-				a-form-model-item
-					a-button.enSesion.anchoComun(type="primary" block @click="procesarSolicitudCambioPass" :loading="procesando")
-						| {{ procesando ? $t('enviandoSolicitud') : $t('cambiarPass') }}
+				.formElemento
+					button.boton.primario.enSesion.anchoComun(block @click="solicitarCambioPass" :loading="procesando")
+						| {{ procesando ? i18n('enviandoSolicitud') : i18n('cambiarPass') }}
 
 
 </template>
-<script>
-export default {
-	props: {
-		email: { type: String, required: false, default: undefined }
-	},
-	data() {
-		const vm = this
+<script lang="ts" setup>
+import { useNuxtApp } from 'nuxt/app'
+import { ref, reactive, computed, watch, nextTick } from 'vue'
+import { z } from 'zod'
+// import { rosetta } from '~/plugins/i18n'
 
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const validatePass = (_rule, value, callback) => {
-			if (vm.passIncorrectos.includes(value)) {
-				callback(new Error('Contraseña incorrecta'))
+// import { rosetta } from '~/plugins/i18n'
+const { $usuario, $consolo, $cuenta } = useNuxtApp()
+
+const { $rosetta } = useNuxtApp()
+// Traducciones
+const i18n = $rosetta({
+	// FORMULARIO
+	cambiaTuPass: {
+		es: 'Cambia tu contraseña',
+		en: 'Change your password'
+	},
+	actualPass: {
+		es: 'Contraseña actual',
+		en: 'Current password'
+	},
+	passwordNuevo: {
+		es: 'Nueva contraseña'
+	},
+	enviandoSolicitud: {
+		es: 'Enviando solicitud'
+	},
+	cambiarPass: {
+		es: 'Cambiar contraseña'
+	},
+
+	// VALIDACION
+	// ingreso
+	muyCorto: {
+		es: 'Muy corto'
+	},
+	// registro
+	noOlvidesEsto: {
+		es: 'No olvides esto'
+	},
+
+	// EXITO
+	hasCambiadoPass: {
+		es: 'Contraseña guardada!'
+	},
+	// FRACASO
+	demasiadosIntentos: {
+		es: 'Demasiados intentos'
+	}
+})
+
+// Refs
+const formCambioPass = ref<HTMLInputElement | null>(null)
+const campoPassNuevo = ref<HTMLInputElement | null>(null)
+const campoPassActual = ref<HTMLInputElement | null>(null)
+
+// Props
+const { email } = defineProps<{
+	email: string
+}>()
+
+// Data
+const cuenta = reactive({
+	// email: '',
+	password: '',
+	passwordNuevo: ''
+})
+
+const procesando = ref<boolean>(false)
+const mostrarPass = ref<boolean>(false)
+const mostrarNuevoPass = ref<boolean>(true)
+const passIncorrectos = reactive<string[]>([])
+const codigosIntentados = reactive<string[]>([])
+
+const Email = z.string().email({ message: i18n('emailInvalido') })
+const CambioPass = z.object({
+	password: z.string({
+		required_error: i18n('noOlvidesEsto'),
+	}).min(6, { message: i18n('muyCorto') }),
+	passwordNuevo: z.string().min(8, { message: i18n('muyCorto') })
+})
+
+// Events
+
+const emitir = defineEmits(['passCambiado'])
+
+// Methods
+async function solicitarCambioPass() {
+	try {
+		const r = CambioPass.safeParse(cuenta)
+		if (!r.success) {
+			console.log('error', r.error)
+			return
+		}
+		const { password, passwordNuevo } = r.data
+		$consolo.log('solicitarCambioPass', { password, passwordNuevo })
+
+		const { ok, error } = await $cuenta.cambiarPass.conPass(password, passwordNuevo)
+
+		procesando.value = false
+		if (!ok && error) {
+			if (error.pass === 'incorrecto') {
+				// $message.error('Contraseña actual incorrecta')
+				passIncorrectos.push(cuenta.password)
 			} else {
-				callback()
+				// $message.error('No se pudo cambiar la contraseña')
+				// error = error
+				console.warn('solicitarCambioPass!! error', error)
 			}
+			return
 		}
-
-		return {
-			procesando: false,
-			error: null,
-
-			passIncorrectos: [],
-
-			cuenta: {},
-
-			reglasCambioPass: {
-				pass: [
-					{ required: true, message: this.$t('noOlvidesEsto') },
-					{ type: 'string', min: 1, message: this.$t('muyCorto') },
-					{ validator: validatePass, trigger: 'change' }
-				],
-				nuevoPass: [
-					{ required: true, message: this.$t('noOlvidesEsto') },
-					{ type: 'string', min: 8, message: this.$t('muyCorto') }
-				]
-			}
-		}
-	},
-	methods: {
-		procesarSolicitudCambioPass() {
-			console.log('procesarSolicitudCambioPass')
-			this.$refs.formCambioPass.validate(valid => {
-				if (valid) {
-					const c = this.cuenta
-					this.solicitarCambioPass(c.pass, c.nuevoPass)
-				} else {
-					console.warn('error submit!!')
-					return false
-				}
-			})
-		},
-		async solicitarCambioPass(pass, passNuevo) {
-			this.$consolo.log('solicitarCambioPass', { pass, passNuevo })
-			this.procesando = true
-			const test = false
-			if (test) {
-				this.procesando = false
-				return
-			}
-			try {
-				const { ok, error } = await this.$cuenta.cambiarPass.conPass(pass, passNuevo)
-				this.procesando = false
-				this.codigosIntentados = []
-				this.codigoSeparado = ['', '', '', '']
-				this.cuenta = Object.assign({}, this.cuenta, { codigo: '' })
-				if (ok) {
-					this.$message.success('Contraseña cambiada')
-					this.$emit('passCambiado')
-				} else if (error) {
-					if (error.pass === 'incorrecto') {
-						this.$message.error('Contraseña actual incorrecta')
-						this.passIncorrectos.push(this.cuenta.pass)
-						this.$nextTick(() => {
-							this.$refs.formCambioPass.validate()
-						})
-					} else {
-						this.$message.error('No se pudo cambiar la contraseña')
-						this.error = error
-						console.warn('solicitarCambioPass!! error', error)
-					}
-				}
-			} catch (e) {
-				console.warn('error solicitarCambioPass!!', e)
-				this.procesando = false
-			}
-		},
-
-		pasarA(el) {
-			el.focus()
-		}
-	},
-	traducciones: {
-		// FORMULARIO
-		cambiaTuPass: { es: 'Cambia tu contraseña' },
-		actualPass: { es: 'Contraseña actual' },
-		nuevoPass: { es: 'Nueva contraseña' },
-		enviandoSolicitud: { es: 'Enviando solicitud' },
-		cambiarPass: { es: 'Cambiar contraseña' },
-
-		// VALIDACION
-		// ingreso
-		muyCorto: { es: 'Muy corto' },
-		// registro
-		noOlvidesEsto: { es: 'No olvides esto' },
-
-		// EXITO
-		hasCambiadoPass: { es: 'Contraseña guardada!' },
-		// FRACASO
-		demasiadosIntentos: { es: 'Demasiados intentos' }
+		// $message.success('Contraseña cambiada')
+		emitir('passCambiado')
+		codigosIntentados.splice(0)
+		cuenta.password = ''
+		cuenta.passwordNuevo = ''
+	} catch (e) {
+		console.warn('error solicitarCambioPass!!', e)
+	} finally {
+		procesando.value = false
 	}
 }
 </script>
@@ -180,16 +209,8 @@ export default {
 		margin-top: .5em
 		border-top: 1px solid hsla(0,0%,50%, .2)
 		padding-top: 1em
-		::v-deep .ant-form-item
-			&:last-child
-				margin-bottom: 0
 
 	a
 		+fwb
 
-	::v-deep
-		// .ant-form-item-label
-		.ant-form-item-required
-			display: flex
-			width: 100%
 </style>

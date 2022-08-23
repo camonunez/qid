@@ -1,7 +1,7 @@
 <template lang="pug">
 .uiInput
 	label.usn.pb-05rem {{ etiqueta }}
-	//- input(:value="modelValue" @input="$emit('update:modelValue', $event.target.value)" )
+	//- input(:value="modelValue" @input="$emitir('update:modelValue', $event.target.value)" )
 
 	.lineaInput.flex.radio
 
@@ -15,7 +15,7 @@
 		.zonaIcono.postIcono.fa00.flex.jcc.aic(v-if="$slots.postIcono")
 			slot(name="postIcono")
 	
-	//@keyup.enter="$emit('enter', $event.value)"
+	//@keyup.enter="$emitir('enter', $event.value)"
 </template>
 <script setup lang="ts">
 import { computed, useAttrs } from 'vue'
@@ -25,7 +25,7 @@ const props = defineProps({
   modelValue: { type: String, required: true },
 })
 const attrs = useAttrs()
-const emit = defineEmits(['update:modelValue'])
+const emitir = defineEmits(['update:modelValue'])
 
 
 const value = computed({
@@ -33,7 +33,7 @@ const value = computed({
     return props.modelValue
   },
   set(value) {
-    emit('update:modelValue', value)
+    emitir('update:modelValue', value)
   }
 })
 

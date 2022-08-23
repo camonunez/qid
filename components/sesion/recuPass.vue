@@ -3,7 +3,7 @@
 	transition(mode="out-in" :duration="300")
 
 		// RECUPERACION PASSWORD
-		a-form-model.formulario(v-if="modoActivo === 'solicitarRecuPass'" key="solicitarRecuPass"
+		form.formulario(v-if="modoActivo === 'solicitarRecuPass'" key="solicitarRecuPass"
 			:model="cuenta"
 			layout="vertical"
 			ref="formRecuPass"
@@ -14,31 +14,43 @@
 				span {{$t('volver')}}
 			h1.titulo {{ $t('recuperaTuPass') }}
 
-			a-form-model-item(prop="email"
-					:label="$t('correo')")
-				a-input(
-					v-enfocar
-					v-model="cuenta.email"
-					:placeholder="$t('correo')"
-					type="email"
-					@keyup.enter="pasarA($refs.nPassword)"
-					autocomplete="email"
-					)
-					a-icon(slot="prefix" type="mail")
-			a-form-model-item(prop="password" :label="$t('nuevoPass')")
-				a-input(
-					ref="nPassword"
-					v-model="cuenta.password"
-					:placeholder="$t('nuevoPass')"
-					type="password"
-					autocomplete="new-password"
-					@keyup.enter="procesarIngreso"
-				)
-					a-icon(slot="prefix" type="key")
+			.formElemento
+
+				UiInput(enfocar v-model="cuenta.email" :etiqueta="i18n('correo')" :placeholder="i18n('correo')" type="email" autocomplete="username" @keyup.enter="campoPassword && campoPassword.focus()")
+					template(v-slot:preIcono)
+						i-carbon-email
+
+				//- a-input(
+				//- 	v-enfocar
+				//- 	v-model="cuenta.email"
+				//- 	:placeholder="$t('correo')"
+				//- 	type="email"
+				//- 	@keyup.enter="pasarA($refs.nPassword)"
+				//- 	autocomplete="email"
+				//- 	)
+				//- 	a-icon(slot="prefix" type="mail")
+			.formElemento
+
+				UiInput(enfocar v-model="cuenta.password" :etiqueta="i18n('nuevoPass')" :placeholder="i18n('contrasena')" :type="mostrarPass ? 'text' : 'password'" autocomplete="new-password")
+					template(v-slot:preIcono)
+						i-carbon-password
+					template(v-slot:postIcono)
+						i-carbon-view-off(v-if="mostrarPass" @click="mostrarPass = false")
+						i-carbon-view(v-else @click="mostrarPass = true")
+
+				//- a-input(
+				//- 	ref="nPassword"
+				//- 	v-model="cuenta.password"
+				//- 	:placeholder="$t('nuevoPass')"
+				//- 	type="password"
+				//- 	autocomplete="new-password"
+				//- 	@keyup.enter="procesarIngreso"
+				//- )
+				//- 	a-icon(slot="prefix" type="key")
 
 			.accion
-				a-form-model-item
-					a-button.enSesion.anchoComun(type="primary" block @click="procesarSolicitudCambioPass" :loading="procesando")
+				.formElemento
+					button.boton.primario.enSesion.anchoComun(block @click="procesarSolicitudCambioPass" :loading="procesando")
 						| {{ procesando ? $t('enviandoSolicitud') : $t('cambiarPass') }}
 
 		// CAMBIO DE PASSWORD CON CODIGO
@@ -55,7 +67,7 @@
 			p {{$t('ingresaloParaConfirmar')}}
 			//- p cuenta.codigo {{cuenta.codigo}} typeof: {{typeof cuenta.codigo}}
 
-			a-form-model-item.formItemCodigo(prop="codigoSeparado" :label="$t('codigoConfirmacion')")
+			.formElemento.formItemCodigo(prop="codigoSeparado" :label="$t('codigoConfirmacion')")
 				a-input.codigo(v-model="codigoSeparado[0]" placeholder="*"
 					:maxLength="1"
 					ref="codigo0"
@@ -82,10 +94,10 @@
 					@keyup="moverCursor($event, $refs.codigo2, null)")
 					//- a-icon(slot="prefix" type="key")
 
-			a-form-model-item.formItemCode(prop="codigo")
+			.formElemento.formItemCode(prop="codigo")
 
 			.accion
-				a-form-model-item
+				.formElemento
 					a-button.enSesion.anchoComun(type="primary" block @click="$refs.formCambioPassCodigo.validate()" :disabled="codigosIntentados.includes(cuenta.codigo)" :loading="procesando")
 						| {{ procesando ? $t('validando') : $t('confirmarCambioPass') }}
 
@@ -99,7 +111,7 @@
 			h1.titulo.tac {{ $t('hasCambiadoPass') }}
 
 			.accion
-				a-form-model-item
+				.formElemento
 					a-button.enSesion.anchoComun(type="primary" block @click="ingresarPostCambioPass")
 						| {{ $t('ingresarAMiCuenta') }}
 
@@ -113,7 +125,7 @@
 			h1.titulo.tac {{ $t('demasiadosIntentos') }}
 
 			.accion
-				a-form-model-item
+				.formElemento
 					a-button.enSesion.anchoComun(type="primary" block @click="reintentar")
 						| {{ $t('reintentar') }}
 
@@ -127,7 +139,7 @@
 			h1.titulo.tac {{ $t('solicitudInvalida') }}
 
 			.accion
-				a-form-model-item
+				.formElemento
 					a-button.enSesion.anchoComun(type="primary" block @click="reintentar")
 						| {{ $t('reintentar') }}
 

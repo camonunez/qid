@@ -5,19 +5,19 @@
 		SesionUsuarioConectado.usuarioConectado(v-if="$usuario" key="conectado")
 
 		// INGRESO
-		.formIngreso(v-else-if="modoActivo === 'ingreso'" key="ingreso" ref="formIngreso")
+		form.formIngreso(v-else-if="modoActivo === 'ingreso'" key="ingreso" ref="formIngreso")
 
 			h1.titulo {{ i18n('ingresaATuCuenta') }}
 
 			.formElemento.mb2rem
 
-				UiInput(enfocar v-model="cuenta.email" :etiqueta="i18n('correo')" :placeholder="i18n('correo')" type="email")
+				UiInput(enfocar v-model="cuenta.email" :etiqueta="i18n('correo')" :placeholder="i18n('correo')" type="email" autocomplete="username")
 					template(v-slot:preIcono)
 						i-carbon-email
 
 			.formElemento
 
-				UiInput(enfocar v-model="cuenta.password" :etiqueta="i18n('contrasena')" :placeholder="i18n('contrasena')" :type="mostrarPass ? 'text' : 'password'")
+				UiInput(enfocar v-model="cuenta.password" :etiqueta="i18n('contrasena')" :placeholder="i18n('contrasena')" :type="mostrarPass ? 'text' : 'password'" autocomplete="current-password")
 					template(v-slot:preIcono)
 						i-carbon-password
 					template(v-slot:postIcono)
@@ -27,8 +27,9 @@
 			.accion
 
 				div.flex.jcsb(slot="label")
-					label {{i18n('contrasena')}}
+					//- label {{i18n('contrasena')}}
 					a.passOlvidada(@click="modoActivo = 'recuperarPass'") Olvidada?
+					
 				.a-form-model-item
 					button.boton.anchoComun.primary(block
 						@click="ingresar"
@@ -325,6 +326,8 @@ const reglasRegistro = {
 		}
 	]
 }
+
+// Watchers
 
 watch(computed(() => cuenta.email), () => {
 	// emailsNoExistentes.splice(0)
