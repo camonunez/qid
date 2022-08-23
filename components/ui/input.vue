@@ -37,11 +37,6 @@ const value = computed({
   }
 })
 
-
-// Directives
-const vFocus = {
-	mounted: (el: HTMLElement) => el && el.focus()
-}
 </script>
 <style lang="sass" scoped>
 @import '@/sass/comun'

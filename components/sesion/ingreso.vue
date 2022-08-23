@@ -248,11 +248,6 @@ const i18n = rosetta({
 	errorDeRed: { es: 'Error de red', en: 'Network error', pt: 'Error de red' }
 })
 
-// Directives
-const vFocus = {
-	mounted: (el: HTMLElement) => el && el.focus()
-}
-
 // Props
 const { modo = 'ingreso' } = defineProps<{
 	modo?: 'ingreso' | 'registro' | 'recuperarPass'

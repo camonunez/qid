@@ -87,7 +87,6 @@
 					@keyup="moverCursor($event, $refs.codigo2, null)")
 					//- i-carbon-password
 
-			.formElemento.formItemCode(prop="codigo")
 
 			.accion
 				.formElemento
@@ -103,13 +102,11 @@
 
 			.accion
 				.formElemento
-					a-button.enSesion.anchoComun(type="primary" block @click="ingresarPostCambioPass")
+					button.boton.primario.enSesion.anchoComun(@click="ingresarPostCambioPass")
 						| {{ i18n('ingresarAMiCuenta') }}
 
 		// NO QUEDAN INTENTOS
-		.formulario(v-else-if="modoActivo === 'demasiadosIntentos'" key="demasiadosIntentos"
-			:model="cuenta"
-			layout="vertical")
+		.formulario(v-else-if="modoActivo === 'demasiadosIntentos'" key="demasiadosIntentos")
 
 			.elIcono
 				i-carbon-error-outline
@@ -118,13 +115,11 @@
 
 			.accion
 				.formElemento
-					a-button.enSesion.anchoComun(type="primary" block @click="reintentar")
+					button.boton.primario.enSesion.anchoComun(@click="reintentar")
 						| {{ i18n('reintentar') }}
 
 		// SOLICITUD INVALIDA
-		.formulario(v-else-if="modoActivo === 'solicitudInvalida'" key="solicitudInvalida"
-			:model="cuenta"
-			layout="vertical")
+		.formulario(v-else-if="modoActivo === 'solicitudInvalida'" key="solicitudInvalida")
 
 			.elIcono
 				i-carbon-error-outline
@@ -133,7 +128,7 @@
 
 			.accion
 				.formElemento
-					a-button.enSesion.anchoComun(type="primary" block @click="reintentar")
+					button.boton.primario.enSesion.anchoComun(@click="reintentar")
 						| {{ i18n('reintentar') }}
 
 </template>
@@ -254,10 +249,6 @@ const i18n = rosetta({
 	},
 })
 
-// Directives
-const vFocus = {
-	mounted: (el: HTMLElement) => el && el.focus()
-}
 
 // Props
 type Modos = 'solicitarRecuPass' | 'cambiarPassCodigo' | 'cambioExitoso' | 'demasiadosIntentos' | 'solicitudInvalida'
@@ -350,7 +341,12 @@ async function solicitarCambioPass() {
 
 async function validarCodigo() {
 	try {
-		const codigo = EncadenadorDeCodigo.safeParse(codigoSeparado.value)
+		const r = EncadenadorDeCodigo.safeParse(codigoSeparado.value)
+		if (!r.success) {
+			console.log('error', r.error)
+			return
+		}
+		const codigo = r.data
 		$consolo.log('validarCodigo', { codigo })
 		procesando.value = true
 
@@ -411,23 +407,10 @@ function reintentar() {
 		margin-top: .5em
 		border-top: 1px solid hsla(0,0%,50%, .2)
 		padding-top: 1em
-		::v-deep .ant-form-item
-			&:last-child
-				margin-bottom: 0
-
 	a
 		&.regresar
 			display: block
 			color: $acento
-	.formItemCodigo
-		::v-deep .ant-form-item-children
-			display: flex
-			width: 100%
-
-			.codigo
-				display: block
-				margin: 0 .5em
-				text-align: center
 
 	.elIcono
 		font-size: 5em

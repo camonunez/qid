@@ -153,16 +153,8 @@ export default {
 		margin-top: .5em
 		border-top: 1px solid hsla(0,0%,50%, .2)
 		padding-top: 1em
-		::v-deep .ant-form-item
-			&:last-child
-				margin-bottom: 0
 
 	a
 		+fwb
 
-	::v-deep
-		// .ant-form-item-label
-		.ant-form-item-required
-			display: flex
-			width: 100%
 </style>
