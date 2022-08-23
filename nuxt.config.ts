@@ -12,6 +12,11 @@ export default defineNuxtConfig({
 			}),
 			Icons()
 		],
+		server: {
+			hmr: {
+				host: 'localhost'
+			}
+		}
 	},
 
 	typescript: {
