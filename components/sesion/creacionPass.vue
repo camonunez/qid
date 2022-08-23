@@ -18,7 +18,7 @@
 					type="email"
 					autocomplete="off"
 				)
-					a-icon(slot="prefix" type="mail")
+					i-carbon-email
 
 			a-form-model-item(prop="nuevoPass" :label="$t('nuevoPass')")
 
@@ -29,7 +29,7 @@
 					autocomplete="new-password"
 					@keyup.enter="procesarCambioPass"
 					)
-					a-icon(slot="prefix" type="key")
+					i-carbon-password
 
 			.accion
 				a-form-model-item

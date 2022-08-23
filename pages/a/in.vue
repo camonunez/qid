@@ -5,7 +5,7 @@
 	div(v-if="$usuario === null") Cargando...
 	div(v-else-if="$usuario === false") 
 		b No conectado
-		SesionIngreso
+		SesionEnTarjeta
 	NuxtChild(v-else)
 	
 
@@ -34,5 +34,5 @@ useHead({
 </script>
 <style lang="sass" scoped>
 .rootIn
-	background-color: #333
+	background-color: #666
 </style>

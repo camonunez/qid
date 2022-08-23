@@ -23,7 +23,7 @@
 				//- 	autocomplete="current-password"
 				//- 	@keyup.enter="campoPassNuevo && campoPassNuevo.focus()"
 				//- )
-				//- 	a-icon(slot="prefix" type="key")
+				//- 	i-carbon-password
 
 
 				UiInput(ref="campoPassActual" 
@@ -47,7 +47,7 @@
 				//- 	autocomplete="new-password"
 				//- 	@keyup.enter="solicitarCambioPass"
 				//- 	)
-				//- 	a-icon(slot="prefix" type="key")
+				//- 	i-carbon-password
 
 				UiInput(ref="campoPassActual" 
 				v-model="cuenta.password" 

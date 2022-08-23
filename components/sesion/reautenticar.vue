@@ -29,7 +29,7 @@
 					autocomplete="current-password"
 					@keyup.enter="procesarSolicitudCambioPass"
 				)
-					a-icon(slot="prefix" type="key")
+					i-carbon-password
 
 
 			.accion

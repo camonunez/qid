@@ -11,13 +11,14 @@
 
 			.formElemento.mb2rem
 
-				UiInput(enfocar v-model="cuenta.email" :etiqueta="i18n('correo')" :placeholder="i18n('correo')" type="email" autocomplete="username")
+				UiInput(vFocus v-model="cuenta.email" :etiqueta="i18n('correo')" :placeholder="i18n('correo')" type="email" autocomplete="email" @keyup.enter="campoPassIngreso && campoPassIngreso.focus")
 					template(v-slot:preIcono)
 						i-carbon-email
 
 			.formElemento
 
-				UiInput(enfocar v-model="cuenta.password" :etiqueta="i18n('contrasena')" :placeholder="i18n('contrasena')" :type="mostrarPass ? 'text' : 'password'" autocomplete="current-password")
+				UiInput(ref="campoPassIngreso"
+					v-model="cuenta.password" :etiqueta="i18n('contrasena')" :placeholder="i18n('contrasena')" :type="mostrarPass ? 'text' : 'password'" autocomplete="current-password")
 					template(v-slot:preIcono)
 						i-carbon-password
 					template(v-slot:postIcono)
@@ -61,22 +62,33 @@
 
 			.grupoCampos
 
-				.formElemento(prop="nombre" :label="i18n('nombre')")
-					input(v-focus v-model="cuenta.nombre" :placeholder="i18n('nombre')" autocomplete="given-name")
+				.formElemento
+					//- input(v-focus v-model="cuenta.nombre" :placeholder="i18n('nombre')" autocomplete="given-name")
+					UiInput(vFocus v-model="cuenta.nombre" :etiqueta="i18n('nombre')" :placeholder="i18n('nombre')" autocomplete="given-name" @keyup.enter="campoPassIngreso && campoPassIngreso.focus")
+						//- template(v-slot:preIcono)
+							i-carbon-email
 
-				.formElemento(prop="apellido" :label="i18n('apellido')")
-					input(v-model="cuenta.apellido" :placeholder="i18n('apellido')" autocomplete="family-name")
+				.formElemento
+					//- input(v-model="cuenta.apellido" :placeholder="i18n('apellido')" autocomplete="family-name")
+					UiInput(vFocus v-model="cuenta.apellido" :etiqueta="i18n('apellido')" :placeholder="i18n('apellido')" autocomplete="family-name" @keyup.enter="campoPassIngreso && campoPassIngreso.focus")
+						//- template(v-slot:preIcono)
+							i-carbon-email
 
-			.formElemento(prop="email" :label="i18n('correo')")
-				input(v-model="cuenta.email" :placeholder="i18n('correo')" type="email" autocomplete="email")
-				i-carbon-email
 
-			.formElemento(prop="password" :label="i18n('contrasena')")
-				input(type="password"
-					v-model="cuenta.password" 
-					:placeholder="i18n('contrasena')"
-					autocomplete="new-password")
-				i-carbon-password
+			.formElemento
+				UiInput(vFocus v-model="cuenta.email" :etiqueta="i18n('correo')" :placeholder="i18n('correo')" type="email" autocomplete="username" @keyup.enter="campoPassIngreso && campoPassIngreso.focus")
+					template(v-slot:preIcono)
+						i-carbon-email
+
+			.formElemento
+
+				UiInput(ref="campoPassRegistro"
+					v-model="cuenta.password" :etiqueta="i18n('contrasena')" :placeholder="i18n('contrasena')" :type="mostrarPass ? 'text' : 'password'" autocomplete="new-password")
+					template(v-slot:preIcono)
+						i-carbon-password
+					template(v-slot:postIcono)
+						i-carbon-view-off(v-if="mostrarPass" @click="mostrarPass = false")
+						i-carbon-view(v-else @click="mostrarPass = true")
 
 			.accion
 				.formElemento
@@ -247,7 +259,7 @@ const { modo = 'ingreso' } = defineProps<{
 }>()
 
 // Refs
-const iPassword = ref(null)
+const campoPassIngreso = ref<HTMLInputElement | null>(null)
 
 // Data
 let modoActivo = ref(modo)
