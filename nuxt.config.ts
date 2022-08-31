@@ -4,6 +4,9 @@ import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 import Components from 'unplugin-vue-components/vite'
 
+
+const dev = process.env.MODO === 'dev'
+
 export default defineNuxtConfig({
 	vite: {
 		plugins: [
@@ -21,7 +24,14 @@ export default defineNuxtConfig({
 
 	typescript: {
 		typeCheck: true,
-		strict: true
+		strict: true,
+		tsConfig: {
+			compilerOptions: {
+				esModuleInterop: true,
+				allowSyntheticDefaultImports: true
+			},
+			exclude: ['../dist', '../components.d.ts', '../node_modules']
+		}
 	},
 
 	runtimeConfig: {
@@ -29,8 +39,8 @@ export default defineNuxtConfig({
 		// apiSecret: '123',
 		// Keys within public, will be also exposed to the client-side
 		public: {
-			apiURL: '/api',
-			dev: process.env.MODO === 'dev'
+			apiURL: dev ? 'https://api.pow.test' : 'https://api.qid.cl',
+			dev
 		}
 	},
 
@@ -39,7 +49,6 @@ export default defineNuxtConfig({
 	head: {
 		link: [
 			{ rel: 'icon', type: 'image/x-icon', href: 'favicon.svg' },
-			{ href: '/fonts/stylesheet.css', rel: 'stylesheet', hid: 'dmsans' }
 		]
 	},
 })

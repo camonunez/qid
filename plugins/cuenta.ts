@@ -9,6 +9,7 @@ import _ from 'lodash'
 import { z } from 'zod'
 
 import dayjs from '@/lib/fechas'
+import Llavero from '@/lib/llavero'
 
 import { TokenBody, Sesion } from './cuentas/types'
 import type { CredencialSesion } from './cuentas/types'
@@ -92,7 +93,10 @@ function capturadorErrorSolicitud(error: AxiosError) {
 //  CuentaAPI
 // *---------*
 
-const config = reactive({
+const config = reactive<{
+	apiURL: string | null
+	dev: boolean | null
+}>({
 	apiURL: null,
 	dev: null
 })
@@ -315,6 +319,7 @@ export default defineNuxtPlugin(nuxtApp => {
 		// console.log('nuxtApp.vueApp', nuxtApp.vueApp)
 		nuxtApp.hook('app:mounted', () => {
 			// console.log('app:mounted')
+			Llavero.init()
 			cuentaAPI.init()
 		})
 		return {

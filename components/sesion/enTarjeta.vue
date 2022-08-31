@@ -1,6 +1,6 @@
 <template lang="pug">
 .sesionEnTarjeta.conFondo.px3rem.py6rem
-	.enElFondo.fondoTrasero.fondoClaro.colorOscuro.radio
+	.enElFondo.fondoTrasero.fondoOscuro.colorOscuro.radio
 	SesionIngreso
 </template>
 <script lang="ts" setup>

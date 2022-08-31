@@ -5,34 +5,40 @@
 		SesionUsuarioConectado.usuarioConectado(v-if="$usuario" key="conectado")
 
 		// INGRESO
-		form.formIngreso(v-else-if="modoActivo === 'ingreso'" key="ingreso" ref="formIngreso")
+		form.formIngreso.anchoComun(v-else-if="modoActivo === 'ingreso'" key="ingreso" ref="formIngreso")
 
 			h1.titulo {{ i18n('ingresaATuCuenta') }}
 
 			.formElemento.mb2rem
 
 				UiInput(vFocus v-model="cuenta.email" :etiqueta="i18n('correo')" :placeholder="i18n('correo')" type="email" autocomplete="email" @keyup.enter="campoPassIngreso && campoPassIngreso.focus")
-					template(v-slot:preIcono)
+					template(#preIcono)
 						i-carbon-email
 
 			.formElemento
 
 				UiInput(ref="campoPassIngreso"
 					v-model="cuenta.password" :etiqueta="i18n('contrasena')" :placeholder="i18n('contrasena')" :type="mostrarPass ? 'text' : 'password'" autocomplete="current-password")
-					template(v-slot:preIcono)
+					template(#etiqueta)
+						.flex.jcsb.aic
+							span {{i18n('contrasena')}}
+							a.passOlvidada.cp(@click="modoActivo = 'recuperarPass'") Olvidada?
+
+					template(#preIcono)
 						i-carbon-password
-					template(v-slot:postIcono)
-						i-carbon-view(v-if="mostrarPass" @click="mostrarPass = false")
-						i-carbon-view-off(v-else @click="mostrarPass = true")
+					template(#postIcono)
+						.clickable
+							i-carbon-view(v-if="mostrarPass" @click="mostrarPass = false")
+							i-carbon-view-off(v-else @click="mostrarPass = true")
 
 			.accion
 
-				div.flex.jcsb(slot="label")
+				//- div.flex.jcsb(slot="label")
 					//- label {{i18n('contrasena')}}
 					a.passOlvidada(@click="modoActivo = 'recuperarPass'") Olvidada?
 					
-				.a-form-model-item
-					button.boton.anchoComun.primary(block
+				.formElemento.mt1rem
+					button.boton.primario.anchoComun(
 						@click="ingresar"
 						:loading="conectando"
 						icon="login"
@@ -65,28 +71,28 @@
 				.formElemento
 					//- input(v-focus v-model="cuenta.nombre" :placeholder="i18n('nombre')" autocomplete="given-name")
 					UiInput(vFocus v-model="cuenta.nombre" :etiqueta="i18n('nombre')" :placeholder="i18n('nombre')" autocomplete="given-name" @keyup.enter="campoPassIngreso && campoPassIngreso.focus")
-						//- template(v-slot:preIcono)
+						//- template(#preIcono)
 							i-carbon-email
 
 				.formElemento
 					//- input(v-model="cuenta.apellido" :placeholder="i18n('apellido')" autocomplete="family-name")
 					UiInput(vFocus v-model="cuenta.apellido" :etiqueta="i18n('apellido')" :placeholder="i18n('apellido')" autocomplete="family-name" @keyup.enter="campoPassIngreso && campoPassIngreso.focus")
-						//- template(v-slot:preIcono)
+						//- template(#preIcono)
 							i-carbon-email
 
 
 			.formElemento
 				UiInput(vFocus v-model="cuenta.email" :etiqueta="i18n('correo')" :placeholder="i18n('correo')" type="email" autocomplete="username" @keyup.enter="campoPassIngreso && campoPassIngreso.focus")
-					template(v-slot:preIcono)
+					template(#preIcono)
 						i-carbon-email
 
 			.formElemento
 
 				UiInput(ref="campoPassRegistro"
 					v-model="cuenta.password" :etiqueta="i18n('contrasena')" :placeholder="i18n('contrasena')" :type="mostrarPass ? 'text' : 'password'" autocomplete="new-password")
-					template(v-slot:preIcono)
+					template(#preIcono)
 						i-carbon-password
-					template(v-slot:postIcono)
+					template(#postIcono)
 						i-carbon-view(v-if="mostrarPass" @click="mostrarPass = false")
 						i-carbon-view-off(v-else @click="mostrarPass = true")
 

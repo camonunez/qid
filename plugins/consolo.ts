@@ -1,24 +1,10 @@
 
 import { defineNuxtPlugin, useRuntimeConfig } from 'nuxt/app'
 
-const consoloff = {
-	log: () => {},
-	info: () => {},
-	warn: () => {},
-	error: () => {},
-	time: () => {},
-	timeEnd: () => {}
-}
-
-
-
 export default defineNuxtPlugin((/* nuxtApp */) => {
 	try {
-
-		const configuracion = useRuntimeConfig()
-		
-		const consolo = configuracion.public.dev ? console : consoloff
-
+		const consolo = useConsolo()
+		// const consolo = configuracion.public.dev ? console : consoloff
 		return {
 			provide: {
 				consolo
