@@ -1,6 +1,6 @@
 import chalk from 'chalk'
 import _ from 'lodash'
-import type { KeyLike } from 'jose'
+import type { JWTPayload, KeyLike } from 'jose'
 import localforage from 'localforage'
 
 import consolo from './consolo'
@@ -15,162 +15,189 @@ type ParDeLlaves = {
 	privada?: KeyLike
 }
 
-type miLlavero = {
+type LlaveroObjeto = {
 	id: string
 	firma: ParDeLlaves
 	encriptacion: ParDeLlaves
-} | undefined
-
-type TokenBody = {
-	iat?: number
-	nbf?: number
-	exp?: number
-	iss?: string
-	sub?: string
 }
 
-let miLlavero: miLlavero = undefined
+type ParDeLlavesExportado = {
+	publica: string
+}
+type LlaveroExportado = {
+	id: string
+	firma: ParDeLlavesExportado
+	encriptacion: ParDeLlavesExportado
+}
 
-const Llavero = {
-	async init() {
-		const fx = `Llavero.init`
-		try {
-			if (usarStores) {
-				// Recuperar el llavero de la memoria local
-				const llaveroMemoria = await llaveroStore.getItem<miLlavero>('miLlavero')
-				if (llaveroMemoria) {
-					miLlavero = llaveroMemoria
-					consolo.log(`${fx}: llavero recuperado de la memoria local`)
-					return
+type Llavero = {
+	exportarLlavesPublicas(): Promise<LlaveroExportado>
+	encriptar(mensaje: string): Promise<string>
+	desencriptar(encriptado: string): Promise<string | undefined>
+	firmarToken(cuerpo: JWTPayload): Promise<string>
+	verificarFirmaToken(mensaje: string): Promise<JWTPayload>
+}
+
+type LlaveroInterno = Pick<Llavero, 'exportarLlavesPublicas' | 'desencriptar' | 'firmarToken'>
+
+type LlaveroExterno = Pick<Llavero, 'encriptar' | 'verificarFirmaToken'>
+
+// *---------*
+
+function instanciadorLlavero(llaveroObjeto: LlaveroObjeto): Llavero {
+	//
+	const llavero: Llavero = {
+		//
+		async exportarLlavesPublicas() {
+			const fx = 'Llavero.exportarLlavesPublicas'
+			try {
+				if (!llaveroObjeto) throw new Error(`${fx}: no hay llavero`)
+				return {
+					id: llaveroObjeto.id,
+					firma: {
+						publica: await cripto.exportar.firma.publica(llaveroObjeto.firma.publica)
+					},
+					encriptacion: {
+						publica: await cripto.exportar.encriptacion.publica(llaveroObjeto.encriptacion.publica)
+					}
 				}
+			} catch (e) {
+				consolo.error(fx, e)
+				throw 'No se pudo exportarLlavesPublicas'
 			}
+		},
 
-			// Crear un llavero nuevo
-			consolo.log(fx)
-			const id = await MiniID()
-			const llavesFirma = await cripto.crearKeysFirmas()
-			const llavesEncriptacion = await cripto.crearKeysEncriptacion()
-			miLlavero = {
-				id,
-				firma: llavesFirma,
-				encriptacion: llavesEncriptacion,
+		// Operaciones
+		async encriptar(mensaje: string) {
+			const fx = 'Llavero.encriptar'
+			try {
+				if (!llaveroObjeto) throw new Error(`${fx}: no hay llavero`)
+				const llave = llaveroObjeto.encriptacion.publica
+				if (!llave) throw 'Falta llave'
+				return await cripto.encriptar(llave, mensaje)
+			} catch (e) {
+				consolo.error(fx, e)
+				throw 'No se pudo encriptar'
 			}
-			if (usarStores) await llaveroStore.setItem<miLlavero>('miLlavero', miLlavero)
-		} catch (e) {
-			consolo.error(fx, e)
-			throw e
-		}
-	},
-
-	async exportarLlavesPublicas() {
-		const fx = `Llavero.exportarLlavesPublicas`
-		try {
-			if (!miLlavero) throw new Error(`${fx}: no hay llavero`)
-			const llaves = {
-				firma: {
-					publica: await cripto.exportar.firma.publica(miLlavero.firma.publica)
-				},
-				encriptacion: {
-					publica: await cripto.exportar.encriptacion.publica(miLlavero.encriptacion.publica)
-				}
+		},
+		async desencriptar(encriptado: string) {
+			const fx = 'Llavero.desencriptar'
+			try {
+				if (!llaveroObjeto) throw new Error(`${fx}: no hay llavero`)
+				consolo.log(fx)
+				const llave = llaveroObjeto.encriptacion.privada
+				return llave && (await cripto.desencriptar(llave, encriptado))
+			} catch (e) {
+				consolo.error(fx, e)
+				throw 'No se pudo desencriptar'
 			}
-			return llaves
-		} catch (e) {
-			consolo.error(fx, e)
-			throw 'No se pudo exportarLlavesPublicas'
+		},
+		async firmarToken(cuerpo: JWTPayload) {
+			const fx = 'Llavero.firmarToken'
+			try {
+				if (!llaveroObjeto) throw new Error(`${fx}: no hay llavero`)
+				consolo.log(fx, cuerpo)
+				const llave = llaveroObjeto.firma.privada
+				if (!llave) throw 'Falta llave'
+
+				cuerpo.iss = llaveroObjeto.id
+				const token = await cripto.firmarToken(llave, cuerpo, llaveroObjeto.id)
+				return token
+			} catch (e) {
+				consolo.error(fx, e)
+				throw 'No se pudo firmarToken'
+			}
+		},
+		async verificarFirmaToken(token: string) {
+			const fx = 'Llavero.verificarFirmaToken'
+			try {
+				if (!llaveroObjeto) throw new Error(`${fx}: no hay llavero`)
+				consolo.log(fx)
+				const llave = llaveroObjeto.firma.publica
+				return llave && (await cripto.verificarFirmaToken(llave, token, llaveroObjeto.id))
+			} catch (e) {
+				if (typeof e === 'string') throw e
+				consolo.error(fx, e)
+				throw 'No se pudo verificarFirmaToken'
+			}
 		}
-	},
+	}
 
-	// Operaciones
-
-	async encriptar(mensaje: string) {
-		const fx = `Llavero.encriptar`
-		try {
-			if (!miLlavero) throw new Error(`${fx}: no hay llavero`)
-			const llave = miLlavero.encriptacion.publica
-			if (!llave) throw 'Falta llave'
-			return await cripto.encriptar(llave, mensaje)
-		} catch (e) {
-			consolo.error(fx, e)
-			throw 'No se pudo encriptar'
-		}
-	},
-
-	async desencriptar(encriptado: string) {
-		const fx = `Llavero.desencriptar`
-		try {
-			if (!miLlavero) throw new Error(`${fx}: no hay llavero`)
-			consolo.log(fx)
-			const llave = miLlavero.encriptacion.privada
-			return llave && (await cripto.desencriptar(llave, encriptado))
-		} catch (e) {
-			consolo.error(fx, e)
-			throw 'No se pudo desencriptar'
-		}
-	},
-
-	async firmarToken(cuerpo: TokenBody) {
-		const fx = `Llavero.firmarToken`
-		try {
-			if (!miLlavero) throw new Error(`${fx}: no hay llavero`)
-			consolo.log(fx, cuerpo)
-			const llave = miLlavero.firma.privada
-			if (!llave) throw 'Falta llave'
-
-			cuerpo.iss = miLlavero.id
-			const token = await cripto.firmarToken(llave, cuerpo, miLlavero.id)
-			return token
-		} catch (e) {
-			consolo.error(fx, e)
-			throw 'No se pudo firmarToken'
-		}
-	},
-
-	async verificarFirmaToken(token: string) {
-		const fx = `Llavero.verificarFirmaToken`
-		try {
-			if (!miLlavero) throw new Error(`${fx}: no hay llavero`)
-			consolo.log(fx)
-			const llave = miLlavero.firma.publica
-			return (
-				llave &&
-				(await cripto.verificarFirmaToken(llave, token, miLlavero.id))
-			)
-		} catch (e) {
-			if (typeof e === 'string') throw e
-			consolo.error(fx, e)
-			throw 'No se pudo verificarFirmaToken'
-		}
-	},
-
-	async crearToken(body: TokenBody) {
-		const fx = `Llavero.crearToken`
-		try {
-			if (!miLlavero) throw new Error(`${fx}: no hay llavero`)
-			consolo.log(fx, body)
-			const llave = miLlavero.firma.privada
-			if (!llave) throw 'Falta llave'
-			body.iss = miLlavero.id
-			return await cripto.firmarToken(llave, body, miLlavero.id)
-		} catch (e) {
-			consolo.error(fx, e)
-			throw 'No se pudo crearToken'
-		}
-	},
-
-	async verificarToken(token: string) {
-		const fx = `Llavero.verificarToken`
-		try {
-			if (!miLlavero) throw new Error(`${fx}: no hay llavero`)
-			const llave = miLlavero.firma.publica
-			const ok = llave && (await cripto.verificarFirmaToken(llave, token, miLlavero.id))
-			consolo.log(chalk.green(fx))
-			return ok
-		} catch (e) {
-			consolo.error(fx, e)
-			throw 'No se pudo verificarToken'
-		}
+	return llavero
+}
+function instanciadorLlaveroInterno(llaveroObjeto: LlaveroObjeto): LlaveroInterno {
+	const llavero = instanciadorLlavero(llaveroObjeto)
+	return {
+		exportarLlavesPublicas: llavero.exportarLlavesPublicas,
+		desencriptar: llavero.desencriptar,
+		firmarToken: llavero.firmarToken
+	}
+}
+function instanciadorLlaveroExterno(llaveroObjeto: LlaveroObjeto): LlaveroExterno {
+	const llavero = instanciadorLlavero(llaveroObjeto)
+	return {
+		encriptar: llavero.encriptar,
+		verificarFirmaToken: llavero.verificarFirmaToken
 	}
 }
 
-export default Llavero
+let miLlaveroObj: LlaveroObjeto | undefined = undefined
+
+export async function obtenerMiLlavero(): Promise<LlaveroInterno> {
+	const fx = 'obtenerMiLlavero'
+	if (miLlaveroObj) {
+		return instanciadorLlaveroInterno(miLlaveroObj)
+	}
+	if (usarStores) {
+		// Recuperar el llavero de la memoria local
+		const llaveroMemoria = await llaveroStore.getItem<LlaveroObjeto>('miLlaveroObj')
+		if (llaveroMemoria) {
+			miLlaveroObj = llaveroMemoria
+			consolo.log(`${fx}: llavero recuperado de la memoria local`)
+			return instanciadorLlaveroInterno(miLlaveroObj)
+		}
+	}
+
+	// Crear un llavero nuevo
+	consolo.log(fx)
+	const id = await MiniID()
+	const llavesFirma = await cripto.crearKeysFirmas()
+	const llavesEncriptacion = await cripto.crearKeysEncriptacion()
+
+	miLlaveroObj = {
+		id,
+		firma: llavesFirma,
+		encriptacion: llavesEncriptacion
+	}
+
+	if (usarStores) {
+		await llaveroStore.setItem<LlaveroObjeto>('miLlaveroObj', miLlaveroObj)
+	}
+
+	return instanciadorLlaveroInterno(miLlaveroObj)
+}
+
+export async function importarLlavero({
+	id,
+	firma,
+	encriptacion
+}: {
+	id: string
+	firma: string
+	encriptacion: string
+}): Promise<LlaveroExterno> {
+	const fx = 'importarLlavero'
+	// Crear un llavero nuevo
+	consolo.log(fx)
+	const firmadoraPublica = await cripto.importar.firma.publica(firma)
+	const encriptadoraPublica = await cripto.importar.encriptacion.publica(encriptacion)
+
+	const llavero: LlaveroObjeto = {
+		id,
+		firma: { publica: firmadoraPublica },
+		encriptacion: { publica: encriptadoraPublica }
+	}
+
+	const llaveroExterno = instanciadorLlaveroExterno(llavero)
+	return llaveroExterno
+}

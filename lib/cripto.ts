@@ -77,7 +77,7 @@ const cripto = {
 		}
 	},
 
-	async encriptar(llavePublica: KeyLike, mensaje: string) {
+	async encriptar(llavePublica: KeyLike, mensaje: string): Promise<string> {
 		const fx = 'Cripto>cripto.encriptar'
 		// consolo.log(fx)
 		try {
@@ -87,9 +87,10 @@ const cripto = {
 			return encriptado
 		} catch (e) {
 			consolo.error(chalk.red(fx), e)
+			throw (e)
 		}
 	},
-	async desencriptar(llavePrivada: KeyLike, jwe: string) {
+	async desencriptar(llavePrivada: KeyLike, jwe: string): Promise<string> {
 		const fx = 'Cripto>cripto.desencriptar'
 		// consolo.log(fx)
 		try {
@@ -102,7 +103,7 @@ const cripto = {
 		}
 	},
 
-	async firmarToken(llavePrivada: jose.KeyLike, cuerpo: JWTPayload, issuer: string) {
+	async firmarToken(llavePrivada: jose.KeyLike, cuerpo: JWTPayload, issuer: string): Promise<string> {
 		const fx = 'Cripto>cripto.firmarToken'
 		try {
 			const jwt = await new jose.SignJWT(cuerpo)
@@ -119,7 +120,7 @@ const cripto = {
 		}
 	},
 
-	async verificarFirmaToken(llavePublica: jose.KeyLike, jwt: string, issuer: string) {
+	async verificarFirmaToken(llavePublica: jose.KeyLike, jwt: string, issuer: string): Promise<JWTPayload> {
 		const fx = 'Cripto>cripto.verificarFirmaToken'
 		try {
 			const { payload } = await jose.jwtVerify(jwt, llavePublica, {
