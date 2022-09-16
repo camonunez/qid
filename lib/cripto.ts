@@ -1,7 +1,7 @@
 import * as jose from 'jose'
 import type { KeyLike, JWTPayload } from 'jose'
 import dayjs from './fechas'
-import chalk from 'chalk'
+// import chalk from 'chalk'
 import consolo from './consolo'
 
 const algFirma = 'RS256'
@@ -18,7 +18,7 @@ const cripto = {
 			// consolo.log(fx, { publica, privada })
 			return { publica, privada }
 		} catch (e) {
-			consolo.error(chalk.red(fx), e)
+			consolo.error(fx, e)
 			throw e
 		}
 	},
@@ -31,7 +31,7 @@ const cripto = {
 			// consolo.log(fx, { publica, privada })
 			return { publica, privada }
 		} catch (e) {
-			consolo.error(chalk.red(fx), e)
+			consolo.error(fx, e)
 			throw e
 		}
 	},
@@ -86,7 +86,7 @@ const cripto = {
 				.encrypt(llavePublica)
 			return encriptado
 		} catch (e) {
-			consolo.error(chalk.red(fx), e)
+			consolo.error(fx, e)
 			throw (e)
 		}
 	},
@@ -98,7 +98,7 @@ const cripto = {
 			const decodificado = new TextDecoder().decode(plaintext)
 			return decodificado
 		} catch (e) {
-			consolo.error(chalk.red(fx), e)
+			consolo.error(fx, e)
 			throw e
 		}
 	},
@@ -115,7 +115,7 @@ const cripto = {
 				.sign(llavePrivada)
 			return jwt
 		} catch (e) {
-			consolo.error(chalk.red(fx), e)
+			consolo.error(fx, e)
 			throw 'No se pudo firmarToken'
 		}
 	},
@@ -131,13 +131,13 @@ const cripto = {
 			return payload
 		} catch (e: any) {
 			if (!e.code) {
-				consolo.error(chalk.red(fx), e)
+				consolo.error(fx, e)
 				throw e
 			}
 			if (e.code === 'ERR_JWS_SIGNATURE_VERIFICATION_FAILED') throw 'token no pasó verificación'
 			if (e.code === 'ERR_JWT_EXPIRED') throw 'token expirado'
 
-			consolo.error(chalk.red(fx), e)
+			consolo.error(fx, e)
 			throw e
 		}
 	}
