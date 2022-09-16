@@ -17,7 +17,7 @@ useHead({
 		{ href: '/fonts/stylesheet.css', rel: 'stylesheet', hid: 'dmsans' }
 	],
 	bodyAttrs: {
-		class: 'test'
+		// class: 'test'
 	}
 })
 </script>

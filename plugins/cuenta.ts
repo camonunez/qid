@@ -155,6 +155,11 @@ export default defineNuxtPlugin(nuxtApp => {
 				const fx = 'cuenta>ingresar'
 				try {
 					console.log(fx, { email, password })
+
+					const miLlavero = await obtenerMiLlavero()
+					const llaves = await miLlavero.exportarLlavesPublicas()
+					const datos = { email, password }
+					// const encriptado = llaveroAPI.encriptar(JSON.stringify(datos), llaves)
 					const r = await clienteAPI({
 						url: `/ingresar`,
 						data: { email, password },
