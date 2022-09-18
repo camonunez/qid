@@ -2,7 +2,6 @@
 div
 	pre codigo {{codigo}}
 	UiInputNumerico(v-model="codigo" etiqueta="****")
-	
 	UiInputCodigo(v-model="codigo" etiqueta="****")
 
 </template>
