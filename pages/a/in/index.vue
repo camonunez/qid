@@ -4,8 +4,6 @@
 
 	h1 IN!!
 
-	NuxtLink(to="/a/in/r") {{t('recuerdos')}}
-
 </template>
 <script setup>
 const { $usuario, $rosetta } = useNuxtApp()

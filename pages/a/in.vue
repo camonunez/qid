@@ -1,7 +1,6 @@
 <template lang="pug">
 .rootIn.flex.jcc.aic.minh100vh
 
-	div(v-if="$usuario === [2]") Cargando...
 	div(v-if="$usuario === null") Cargando...
 	div(v-else-if="$usuario === false") 
 		b No conectado
@@ -11,17 +10,9 @@
 
 </template>
 <script setup lang="ts">
-import { useNuxtApp, useHead } from 'nuxt/app'
-import { z } from 'zod'
+import { rosetta } from '@/plugins/i18n'
 
-const { $usuario, $rosetta } = useNuxtApp()
-
-if (typeof window !== 'undefined') {
-	// @ts-ignore
-	window.z = z
-}
-
-const traductor = $rosetta({
+const t = rosetta({
 	noConectado: {
 		es: 'No conectado',
 		en: 'Not connected'
