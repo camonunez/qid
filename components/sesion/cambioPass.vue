@@ -89,32 +89,44 @@ const i18n = $rosetta({
 		en: 'Current password'
 	},
 	passwordNuevo: {
-		es: 'Nueva contraseña'
+		es: 'Nueva contraseña',
+		en: 'New password'
 	},
 	enviandoSolicitud: {
-		es: 'Enviando solicitud'
+		es: 'Enviando solicitud',
+		en: 'Sending request'
 	},
 	cambiarPass: {
-		es: 'Cambiar contraseña'
+		es: 'Cambiar contraseña',
+		en: 'Change password'
 	},
 
 	// VALIDACION
 	// ingreso
 	muyCorto: {
-		es: 'Muy corto'
+		es: 'Muy corto',
+		en: 'Too short'
 	},
 	// registro
 	noOlvidesEsto: {
-		es: 'No olvides esto'
+		es: 'No olvides esto',
+		en: 'Don\'t forget this'
 	},
 
 	// EXITO
 	hasCambiadoPass: {
-		es: 'Contraseña guardada!'
+		es: 'Contraseña guardada!',
+		en: 'Password saved!'
 	},
 	// FRACASO
 	demasiadosIntentos: {
-		es: 'Demasiados intentos'
+		es: 'Demasiados intentos',
+		en: 'Too many attempts'
+	},
+
+	emailInvalido: {
+		es: 'Email inválido',
+		en: 'Invalid email'
 	}
 })
 
