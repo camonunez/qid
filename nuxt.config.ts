@@ -13,13 +13,13 @@ export default defineNuxtConfig({
 			Components({
 				resolvers: [IconsResolver()]
 			}),
-			Icons()
+			Icons({})
 		],
 		server: {
 			hmr: {
 				host: 'localhost'
 			}
-		}
+		} 
 	},
 
 	typescript: {
@@ -30,7 +30,7 @@ export default defineNuxtConfig({
 				esModuleInterop: true,
 				allowSyntheticDefaultImports: true
 			},
-			exclude: ['../dist', '../components.d.ts', '../node_modules']
+			exclude: ['../dist', '../components.d.ts', '../node_modules', './node_modules']
 		}
 	},
 
