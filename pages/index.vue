@@ -2,9 +2,9 @@
 .flex.jcc.aic.minh100vh
 
 	.anchoComun
-		h1 Hola
+		h1 Hola index
 
-		NuxtLink.boton(to="/a") App
+		NuxtLink.boton(to="/a") Appp
 	
 
 </template>
