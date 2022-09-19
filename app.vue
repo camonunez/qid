@@ -1,5 +1,5 @@
 <template lang="pug">
 div.appRoot
-	NuxtLayout.appLayout
-		NuxtPage.appPage
+	NuxtLayout
+		NuxtPage
 </template>
