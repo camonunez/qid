@@ -7,9 +7,9 @@
     "preview": "nuxt preview"
   },
   "devDependencies": {
-    "@ant-design/icons-vue": "^6.1.0",
     "@iconify-json/mdi": "^1.1.30",
     "@types/lodash": "^4.14.182",
+    "@types/node": "^18.7.18",
     "nuxt": "3.0.0-rc.8",
     "pug": "^3.0.2",
     "ts-node": "^10.9.1",
@@ -27,7 +27,6 @@
     "@iconify-json/pixelarticons": "^1.1.4",
     "@iconify-json/system-uicons": "^1.1.4",
     "@iconify/types": "^2.0.0",
-    "ant-design-vue": "3.2.10",
     "axios": "^0.27.2",
     "dayjs": "^1.11.5",
     "jose": "^4.9.3",
