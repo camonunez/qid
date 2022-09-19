@@ -1,12 +1,4 @@
 <template lang="pug">
-#appRoot
-	NuxtChild
+NuxtLayout
+	NuxtPage
 </template>
-<style lang="sass">
-	
-#appRoot
-	width: 100vw
-	max-width: 100%
-
-
-</style>
