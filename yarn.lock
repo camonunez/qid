@@ -1054,6 +1054,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/web-bluetooth@npm:^0.0.15":
+  version: 0.0.15
+  resolution: "@types/web-bluetooth@npm:0.0.15"
+  checksum: 4e3b3b1c0baf6735690ce0c5ffaac53de3dbd16362316cbc5e32970bcb1e1baf16dae0a9f30fe86256ad0ee22a4533423f443835273efc54b15235086ebda85b
+  languageName: node
+  linkType: hard
+
 "@vercel/nft@npm:^0.21.0":
   version: 0.21.0
   resolution: "@vercel/nft@npm:0.21.0"
@@ -1305,6 +1312,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vueuse/components@npm:^9.2.0":
+  version: 9.2.0
+  resolution: "@vueuse/components@npm:9.2.0"
+  dependencies:
+    "@vueuse/core": 9.2.0
+    "@vueuse/shared": 9.2.0
+    vue-demi: "*"
+  checksum: 198a3c94ec3c90faa5f4589f5cc6f18f9a7bbaeef27cfe364381fb79312c50a29d560615cde2c109b62a30fe7229db34afe40d335c7ff7c042583730fbf4f1ae
+  languageName: node
+  linkType: hard
+
+"@vueuse/core@npm:9.2.0, @vueuse/core@npm:^9.2.0":
+  version: 9.2.0
+  resolution: "@vueuse/core@npm:9.2.0"
+  dependencies:
+    "@types/web-bluetooth": ^0.0.15
+    "@vueuse/metadata": 9.2.0
+    "@vueuse/shared": 9.2.0
+    vue-demi: "*"
+  checksum: 2ae6ef58ae932fe260911239888405e39e7cf7f9afdd512cc184248d97b66e1ec15a6a54b75835db040e68c35eafefe265071ff1a42b45d220217b8f9974a403
+  languageName: node
+  linkType: hard
+
 "@vueuse/head@npm:^0.7.9":
   version: 0.7.12
   resolution: "@vueuse/head@npm:0.7.12"
@@ -1316,7 +1346,29 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vueuse/shared@npm:^9.2.0":
+"@vueuse/metadata@npm:9.2.0":
+  version: 9.2.0
+  resolution: "@vueuse/metadata@npm:9.2.0"
+  checksum: 99c63f3ba1bf8b4aac9ec226d918906842589a93f3affafb17aaa9c64da433c8747f6fd829ac6a2f313c1d8c6003742ccbedba45d2dcce38da7ea5ff657e63c9
+  languageName: node
+  linkType: hard
+
+"@vueuse/nuxt@npm:^9.2.0":
+  version: 9.2.0
+  resolution: "@vueuse/nuxt@npm:9.2.0"
+  dependencies:
+    "@nuxt/kit": ^3.0.0-rc.9
+    "@vueuse/core": 9.2.0
+    "@vueuse/metadata": 9.2.0
+    local-pkg: ^0.4.2
+    vue-demi: "*"
+  peerDependencies:
+    nuxt: ^3.0.0-rc.9
+  checksum: 3da194dc777a6882ea884a42cde45750ace20e3e386c4b6d34bc4936441c2d8e65350fa382627c9a9186748245a486e9b38b3bbb1717e2d482faf1250edde144
+  languageName: node
+  linkType: hard
+
+"@vueuse/shared@npm:9.2.0, @vueuse/shared@npm:^9.2.0":
   version: 9.2.0
   resolution: "@vueuse/shared@npm:9.2.0"
   dependencies:
@@ -6216,6 +6268,9 @@ __metadata:
     "@iconify/types": ^2.0.0
     "@types/lodash": ^4.14.182
     "@types/node": ^18.7.18
+    "@vueuse/components": ^9.2.0
+    "@vueuse/core": ^9.2.0
+    "@vueuse/nuxt": ^9.2.0
     axios: ^0.27.2
     dayjs: ^1.11.5
     jose: ^4.9.3
@@ -6230,6 +6285,7 @@ __metadata:
     typescript: ^4.7.4
     unplugin-icons: ^0.14.8
     unplugin-vue-components: ^0.22.0
+    vue-observe-visibility: ^1.0.0
     vue-tsc: ^0.39.5
     zod: ^3.19.1
   languageName: unknown
@@ -7326,6 +7382,13 @@ __metadata:
     vue-demi-fix: bin/vue-demi-fix.js
     vue-demi-switch: bin/vue-demi-switch.js
   checksum: 0fbe9bf8ab7fe498ffa2bbd0cfc8f6f43a6bbaa5eda3e20ef1b70dca7c8b0ddb216a7ff2f632b694fe0735805638975abb441c621ec0bd2e6d4656353f316c15
+  languageName: node
+  linkType: hard
+
+"vue-observe-visibility@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "vue-observe-visibility@npm:1.0.0"
+  checksum: f5fe4b9e7804820f21971468cb432799540708ed7bdb946fa115f80a4ff6589228fe8e83125eac856c79a754cb490cdb37bffd2fd3c806a4c908dd2178355eca
   languageName: node
   linkType: hard
 

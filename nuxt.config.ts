@@ -51,4 +51,8 @@ export default defineNuxtConfig({
 			{ rel: 'icon', type: 'image/x-icon', href: 'favicon.svg' },
 		]
 	},
+
+	modules: [
+		'@vueuse/nuxt',
+	],
 })

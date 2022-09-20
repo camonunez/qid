@@ -4,7 +4,7 @@
 	.anchoComun
 		h1 Alba
 
-</template>
+</template>w
 <script setup>
 
 </script>

@@ -6,5 +6,9 @@
 
 </template>
 <script setup>
-
+async function obtenerWeas () {
+	const { data, pending, error, refresh } = await useFetch('https://api.nuxtjs.dev/mountains',{
+			pick: ['title']
+	})
+}
 </script>
