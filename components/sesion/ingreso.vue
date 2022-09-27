@@ -39,7 +39,7 @@
 					
 				.formElemento.mt1rem
 					button.boton.primario.anchoComun(
-						@click="ingresar"
+						@click.prevent="ingresar"
 						:loading="conectando"
 						icon="login"
 						:disabled="passIncorrectos.includes(cuenta.password)"
@@ -113,7 +113,7 @@
 			@ingresarConNuevoPass="ingresar")
 
 
-	//- .sinConexion.flex.aic(v-if="$inConexion" @click="$cuenta.ping()")
+	//- .sinConexion.flex.aic(v-if="$inConexion" @click="$cuentaAPI.ping()")
 	//- 	.oicono.enchufe.m
 	//- 	.texto {{i18n('errorDeRed')}}
 </template>
@@ -125,8 +125,7 @@ import { rosetta } from '@/plugins/i18n'
 import { z } from 'zod'
 
 // Plugins
-const { $usuario, $consolo, $cuenta } = useNuxtApp()
-
+const { $usuario, $consolo, $cuentaAPI } = useNuxtApp()
 
 // i18n
 const i18n = rosetta({
@@ -153,7 +152,8 @@ const i18n = rosetta({
 		en: 'Sign in'
 	},
 	passIncorrecto: {
-		es: 'Incorrecto', en: 'Incorrect'
+		es: 'Incorrecto',
+		en: 'Incorrect'
 	},
 	correoNoRegistrado: {
 		es: 'Correo no registrado',
@@ -235,20 +235,20 @@ const i18n = rosetta({
 	},
 	muyCorto: {
 		es: 'Muy corto',
-		en: 'Too short',
+		en: 'Too short'
 	},
 	// registro
 	nombreInvalido: {
 		es: 'Nombre inválido',
-		en: 'Invalid name',
+		en: 'Invalid name'
 	},
 	apellidoInvalido: {
 		es: 'Apellido inválido',
-		en: 'Invalid surname',
+		en: 'Invalid surname'
 	},
 	noOlvidesEsto: {
 		es: 'No olvides esto',
-		en: 'Don\'t forget this',
+		en: "Don't forget this"
 	},
 
 	errorDeRed: { es: 'Error de red', en: 'Network error', pt: 'Error de red' }
@@ -267,11 +267,17 @@ let modoActivo = ref(modo)
 let mostrarPass = ref<boolean>(false)
 let conectando = ref<boolean>(false)
 const cuenta = reactive({
-	nombre: '',
-	apellido: '',
-	email: '',
-	password: '',
-	confirmacion: ''
+	// nombre: '',
+	// apellido: '',
+	// email: '',
+	// password: '',
+	// confirmacion: '',
+
+	email: 'contador@pow.cl',
+	password: 'walalala',
+	confirmacion: 'walalala',
+	nombre: 'Contador',
+	apellido: 'Contador'
 })
 
 const emailsNoExistentes = reactive<string[]>([])
@@ -287,8 +293,8 @@ type Ingreso = z.infer<typeof Ingreso>
 
 const Registro = z.object({
 	nombre: z.string({
-		required_error: "Name is required",
-		invalid_type_error: "Name must be a string",
+		required_error: 'Name is required',
+		invalid_type_error: 'Name must be a string'
 	}),
 	apellido: z.string(),
 	email: Email,
@@ -342,12 +348,13 @@ const reglasRegistro = {
 
 // Watchers
 
-watch(computed(() => cuenta.email), () => {
-	// emailsNoExistentes.splice(0)
-	passIncorrectos.splice(0)
-})
-
-
+watch(
+	computed(() => cuenta.email),
+	() => {
+		// emailsNoExistentes.splice(0)
+		passIncorrectos.splice(0)
+	}
+)
 
 // Methods
 function enfocarEn(el: HTMLElement | null) {
@@ -355,16 +362,18 @@ function enfocarEn(el: HTMLElement | null) {
 }
 
 async function ingresar() {
+	const fx = 'ingresar'
 	try {
 		const r = Ingreso.safeParse(cuenta)
 		if (!r.success) {
-			console.log('error', r.error)
-			return
+			console.log(fx, 'error', r.error)
+			return false
 		}
+		console.log(fx, 'pasó')
 		const { email, password } = r.data
-		$consolo.log('ingresar', { email, password })
+		console.log('ingresar', { email, password })
 		conectando.value = true
-		const s = await $cuenta.ingresar(email, password)
+		const s = await $cuentaAPI.ingresar(email, password)
 		$consolo.log('r', s)
 
 		if (!s.ok) {
@@ -373,9 +382,8 @@ async function ingresar() {
 		}
 	} catch (e) {
 		console.error('caught', e)
-		conectando.value = false
-	} finally {
-		conectando.value = false
+		// } finally {
+		// 	conectando.value = false
 	}
 }
 
@@ -395,12 +403,12 @@ async function registrar() {
 		const r = Registro.safeParse(cuenta)
 		if (!r.success) {
 			console.log('error', r.error)
-			return
+			return false
 		}
 		conectando.value = true
 		const { nombre, apellido, email, password } = r.data
 		$consolo.log('registrar', { nombre, apellido, email, password })
-		await $cuenta.crearCuenta(nombre, apellido, email, password)
+		await $cuentaAPI.crearCuenta(nombre, apellido, email, password)
 	} catch (e) {
 		$consolo.error('registrar', e)
 	} finally {
@@ -415,7 +423,6 @@ function resetRegistro() {
 	cuenta.password = ''
 	cuenta.confirmacion = ''
 }
-
 </script>
 <style lang="sass" scoped>
 @import "~/sass/comun"

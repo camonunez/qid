@@ -1,6 +1,6 @@
 import { defineNuxtPlugin } from 'nuxt/app'
 import { reactive, readonly } from 'vue'
-import dayjs from '@/lib/fechas'
+import dayjs from '@/lib/fecha'
 
 console.log('FECHAS', 'process.client', process.client)
 const reloj = reactive({

@@ -5,12 +5,18 @@ import jwtDecode from 'jwt-decode'
 import _ from 'lodash'
 import { z } from 'zod'
 
-import dayjs from '@/lib/fechas'
-import { obtenerMiLlavero, importarLlavero } from '@/lib/llavero'
+import dayjs from '@/lib/fecha'
+import { validadorEmail, validadorPass, validadorToken } from '@/lib/validadores'
+import { obtenerLlaveroPropio } from '@/lib/miLlavero'
+import { LlaveroExterno } from '@/lib/llavero'
 import crearClienteHTTP from '@/lib/clienteHTTP'
 
 import { TokenBody, Sesion } from './cuentas/types'
 import type { CredencialSesion } from './cuentas/types'
+
+declare global {
+	interface Window { obtenerLlaveroAPI: typeof obtenerLlaveroAPI; }
+}
 
 const tokenReactivo = ref({
 	token: null,
@@ -47,11 +53,36 @@ const sesion = reactive({
 //  CuentaAPI
 // *---------*
 
+let llaveroAPICache: LlaveroExterno | null = null
+
+async function obtenerLlaveroAPI () {
+	const fx = 'obtenerLlaveroAPI'
+	if (llaveroAPICache) return llaveroAPICache
+	
+	const r = await clienteAPI({
+		url: `/llavero`,
+		method: 'get',
+	})
+
+	console.log(fx, r)
+
+	const llaveroAPISchema = z.object({
+		_id: z.string(),
+		firma: z.string(),
+		encriptacion: z.string()
+	})
+
+	const { _id, firma, encriptacion } = llaveroAPISchema.parse(r)
+
+	llaveroAPICache = await LlaveroExterno.instanciar({ _id, firma, encriptacion })
+	return llaveroAPICache
+}
+
 const config = reactive<{
-	apiURL: string | null
+	cuentaAPIURL: string | null
 	dev: boolean | null
 }>({
-	apiURL: null,
+	cuentaAPIURL: null,
 	dev: null
 })
 
@@ -62,234 +93,287 @@ const testToken = z.string()
 
 export const usuario = computed(() => sesion.usuario)
 
+const clienteAPI = crearClienteHTTP()
+
+clienteAPI.on('http:hayRespuesta', () => {
+	if (sesion.sinConexion) sesion.sinConexion = false
+})
+clienteAPI.on('http:sinRespuesta', () => {
+	cuentaAPI.ping()
+})
+clienteAPI.on('desconectado', () => {
+	cuentaAPI.salir()
+})
+
+const cuentaAPI = {
+	async init(config: {
+		baseURL: string
+		dev: boolean
+	}) {
+		const fx = 'cuenta>init'
+		try {
+			clienteAPI.init(config.baseURL)
+			const token = await cuentaStore.getItem('token')
+			if (typeof token === 'string') cuentaAPI.ingresarConToken(token)
+			else cuentaAPI.salir()
+		} catch (e) {
+			console.error(`${fx} error`, e)
+		}
+	},
+	async ping() {
+		const fx = 'cuenta>ping'
+		try {
+			console.log(`%c${fx}`, 'color: #44ccff')
+			const r = await clienteAPI(
+				{
+					url: `/ping`,
+					method: 'get'
+				},
+				() => {
+					sesion.sinConexion = true
+				}
+			)
+			sesion.sinConexion = r && r.ok ? false : true
+		} catch (e) {
+			console.error(`${fx} error`, e)
+		}
+	},
+
+	async llaveroPrincipal () {
+		const fx = 'cuenta>llaveroPrincipal'
+		try {
+			console.log(`%c${fx}`, 'color: #44CCFF')
+
+			const r = await clienteAPI({
+				url: `/llavero`,
+				method: 'get',
+			})
+
+			console.log(`${fx} r`, r)
+			// const llavero = Llavero.reinstanciar()
+			// llaveroAPICache = 
+		} catch (e) {
+			console.error(`${fx} error`, e)
+		}
+	},
+
+	async leer(t = elToken) {
+		const fx = 'cuenta>leer'
+		try {
+			console.log(`%c${fx}`, 'color: #44CCFF')
+
+			const tkn = testToken.parse(t)
+
+			const r = await clienteAPI({
+				url: ``,
+				method: 'get',
+				headers: { Authorization: `Bearer ${tkn}` }
+			})
+
+			console.log(`${fx} r`, r)
+
+			sesion.usuario = r.usuario
+		} catch (e) {
+			console.error(`${fx} error`, e)
+		}
+	},
+
+	async ingresarConToken(token: string) {
+		const fx = 'cuenta>ingresarConToken'
+		const tkn = testToken.parse(token)
+		try {
+			console.log(`%c${fx}`, 'color: #44ccff')
+			const r = await clienteAPI({
+				url: ``,
+				method: 'get',
+				headers: { Authorization: `Bearer ${tkn}` }
+			})
+
+			console.log(`${fx} r`, r)
+
+			sesion.usuario = r.usuario
+			elToken.value = tkn
+		} catch (e) {
+			console.error(`${fx} error`, e)
+		}
+	},
+
+	async ingresar(email: string, password: string) {
+		const fx = 'cuenta>ingresar'
+		try {
+			const inputIngresoSchema = z.object({
+				password: validadorPass,
+				email: validadorEmail
+			})
+			inputIngresoSchema.parse({ email, password })
+			console.log(fx, { email, password })
+
+			const llaveroCliente = await obtenerLlaveroPropio()
+			const llaveroPublicoCliente = await llaveroCliente.exportarLlaveroPublico()
+			const datos = { email, password }
+
+			const llaveroAPI = await obtenerLlaveroAPI()
+			const emailPassEncriptado = await llaveroAPI.encriptar(datos)
+
+			console.log('datos', datos)
+			console.log('encriptado', emailPassEncriptado)
+			const r = await clienteAPI({
+				url: `/ingresar`,
+				data: { encriptado: emailPassEncriptado, llaveroPublicoCliente },
+				method: 'post'
+			})
+
+			const respuestaSchema = z.object({
+				token: validadorToken,
+				encriptado: z.string()
+			})
+			const { token, encriptado } = respuestaSchema.parse(r)
+			const decriptado = await llaveroCliente.decriptar(encriptado)
+			console.log(`${fx} token`, token)
+			console.log(`${fx} decriptado`, decriptado)
+			const usuarioSchema = z.object({
+				_id: z.string(),
+				email: validadorEmail,
+				nombre: z.string(),
+				apellido: z.string(),
+			})
+			const usuario = usuarioSchema.parse(decriptado)
+			if (r.ok) {
+				sesion.usuario = usuario
+				elToken.value = token
+			}
+			return r
+		} catch (e) {
+			console.error(`${fx} error`, e)
+		}
+	},
+
+	async salir() {
+		const fx = 'cuenta>salir'
+		try {
+			console.log(`%c${fx}`, 'color: #44ccff')
+			sesion.usuario = false
+			elToken.value = null
+
+			await cuentaStore.clear()
+			return true
+		} catch (e) {
+			console.error(`${fx} error`, e)
+		}
+	},
+
+	async crearCuenta(nombre: string, apellido: string, email: string, password: string) {
+		const fx = 'cuenta>crearCuenta'
+		try {
+			console.log(fx, { nombre, apellido, email, password })
+			const r = await clienteAPI({
+				url: `/crear`,
+				data: { nombre, apellido, email, password },
+				method: 'post'
+			})
+			console.log(`${fx} r`, r)
+
+			sesion.usuario = r.usuario || false
+			elToken.value = r.token || null
+			if (r.token) await cuentaAPI.leer()
+
+			return r
+		} catch (e) {
+			console.error(`${fx} error`, e)
+		}
+	},
+
+	cambiarPass: {
+		async pedirCodigo(email: string, passNuevo: string) {
+			const fx = 'cuenta>cambiarPass>pedirCodigo'
+			try {
+				z.string().parse(email)
+				z.string().parse(passNuevo)
+
+				console.log(`%c${fx}`, 'color: #44ccff')
+				const r = await clienteAPI({
+					url: `/cambiarPass/pedirCodigo`,
+					method: 'post',
+					data: { email, passNuevo }
+				})
+				console.log(`${fx} r`, r)
+				return r
+			} catch (e) {
+				console.error(`${fx} error`, e)
+			}
+		},
+		async conCodigo(email: string, codigo: string) {
+			const fx = 'cuenta>cambiarPass>conCodigo'
+			try {
+				console.log(`%c${fx}`, 'color: #44ccff')
+				const r = await clienteAPI({
+					url: `/cambiarPass/conCodigo`,
+					method: 'post',
+					data: { email, codigo }
+				})
+				console.log(`${fx} r`, r)
+				return r
+			} catch (e) {
+				console.error(`${fx} error`, e)
+			}
+		}
+	},
+
+	async obtenerCargaFirmadaAvatar() {
+		const fx = 'cuenta>obtenerCargaFirmadaAvatar'
+		try {
+			console.log(`%c${fx}`, 'color: #44ccff')
+			if (!elToken.value) throw 'Usuario no conectado'
+			const r = await clienteAPI({
+				url: `/avatar/putUrl`,
+				method: 'get',
+				headers: { Authorization: `Bearer ${elToken.value}` }
+			})
+			console.log(`${fx} r`, r)
+			return r.url
+		} catch (e) {
+			console.error(`${fx} error`, e)
+		}
+	},
+
+	async guardarUrlAvatar(url: string) {
+		const fx = 'cuenta>guardarUrlAvatar'
+		try {
+			console.log(fx, url)
+			if (!elToken.value) throw 'Usuario no conectado'
+			if (!url) throw 'falta url del avatar'
+			const r = await clienteAPI({
+				url: `/avatar/url`,
+				method: 'post',
+				data: { url },
+				headers: { Authorization: `Bearer ${elToken.value}` }
+			})
+			console.log(`${fx} r`, r)
+
+			sesion.usuario = r.usuario || false
+			return r
+		} catch (e) {
+			console.error(`${fx} error`, e)
+		}
+	}
+}
+
+
 export default defineNuxtPlugin(nuxtApp => {
 	try {
 		const c = useRuntimeConfig()
-		config.apiURL = c.public.apiURL
-		config.dev = c.public.dev
 
-		const clienteAPI = crearClienteHTTP(config.apiURL)
-
-		clienteAPI.on('http:hayRespuesta', () => {
-			if (sesion.sinConexion) sesion.sinConexion = false
-		})
-		clienteAPI.on('http:sinRespuesta', () => {
-			cuentaAPI.ping()
-		})
-		clienteAPI.on('desconectado', () => {
-			cuentaAPI.salir()
-		})
-
-		const cuentaAPI = {
-			async init() {
-				const fx = 'cuenta>init'
-				try {
-					const token = await cuentaStore.getItem('token')
-					if (typeof token === 'string') cuentaAPI.ingresarConToken(token)
-					else cuentaAPI.salir()
-				} catch (e) {
-					console.error(`${fx} error`, e)
-				}
-			},
-			async ping() {
-				const fx = 'cuenta>ping'
-				try {
-					console.log(`%c${fx}`, 'color: #44ccff')
-					const r = await clienteAPI(
-						{
-							url: `/ping`,
-							method: 'get'
-						},
-						() => {
-							sesion.sinConexion = true
-						}
-					)
-					sesion.sinConexion = r && r.ok ? false : true
-				} catch (e) {
-					console.error(`${fx} error`, e)
-				}
-			},
-
-			async leer(t = elToken) {
-				const fx = 'cuenta>leer'
-				try {
-					console.log(`%c${fx}`, 'color: #44CCFF')
-
-					const tkn = testToken.parse(t)
-
-					const r = await clienteAPI({
-						url: ``,
-						method: 'get',
-						headers: { Authorization: `Bearer ${tkn}` }
-					})
-
-					console.log(`${fx} r`, r)
-
-					sesion.usuario = r.usuario
-				} catch (e) {
-					console.error(`${fx} error`, e)
-				}
-			},
-
-			async ingresarConToken(token: string) {
-				const fx = 'cuenta>ingresarConToken'
-				const tkn = testToken.parse(token)
-				try {
-					console.log(`%c${fx}`, 'color: #44ccff')
-					const r = await clienteAPI({
-						url: ``,
-						method: 'get',
-						headers: { Authorization: `Bearer ${tkn}` }
-					})
-
-					console.log(`${fx} r`, r)
-
-					sesion.usuario = r.usuario
-					elToken.value = tkn
-				} catch (e) {
-					console.error(`${fx} error`, e)
-				}
-			},
-
-			async ingresar(email: string, password: string) {
-				const fx = 'cuenta>ingresar'
-				try {
-					console.log(fx, { email, password })
-
-					const miLlavero = await obtenerMiLlavero()
-					const llaves = await miLlavero.exportarLlavesPublicas()
-					const datos = { email, password }
-					// const encriptado = llaveroAPI.encriptar(JSON.stringify(datos), llaves)
-					const r = await clienteAPI({
-						url: `/ingresar`,
-						data: { email, password },
-						method: 'post'
-					})
-					console.log(`${fx} r`, r)
-					if (r.ok) {
-						sesion.usuario = r.usuario
-						elToken.value = r.token
-					}
-					return r
-				} catch (e) {
-					console.error(`${fx} error`, e)
-				}
-			},
-
-			async salir() {
-				const fx = 'cuenta>salir'
-				try {
-					console.log(`%c${fx}`, 'color: #44ccff')
-					sesion.usuario = false
-					elToken.value = null
-
-					await cuentaStore.clear()
-					return true
-				} catch (e) {
-					console.error(`${fx} error`, e)
-				}
-			},
-
-			async crearCuenta(nombre: string, apellido: string, email: string, password: string) {
-				const fx = 'cuenta>crearCuenta'
-				try {
-					console.log(fx, { nombre, apellido, email, password })
-					const r = await clienteAPI({
-						url: `/crear`,
-						data: { nombre, apellido, email, password },
-						method: 'post'
-					})
-					console.log(`${fx} r`, r)
-
-					sesion.usuario = r.usuario || false
-					elToken.value = r.token || null
-					if (r.token) await cuentaAPI.leer()
-
-					return r
-				} catch (e) {
-					console.error(`${fx} error`, e)
-				}
-			},
-
-			cambiarPass: {
-				async pedirCodigo(email: string, passNuevo: string) {
-					const fx = 'cuenta>cambiarPass>pedirCodigo'
-					try {
-						z.string().parse(email)
-						z.string().parse(passNuevo)
-
-						console.log(`%c${fx}`, 'color: #44ccff')
-						const r = await clienteAPI({
-							url: `/cambiarPass/pedirCodigo`,
-							method: 'post',
-							data: { email, passNuevo }
-						})
-						console.log(`${fx} r`, r)
-						return r
-					} catch (e) {
-						console.error(`${fx} error`, e)
-					}
-				},
-				async conCodigo(email: string, codigo: string) {
-					const fx = 'cuenta>cambiarPass>conCodigo'
-					try {
-						console.log(`%c${fx}`, 'color: #44ccff')
-						const r = await clienteAPI({
-							url: `/cambiarPass/conCodigo`,
-							method: 'post',
-							data: { email, codigo }
-						})
-						console.log(`${fx} r`, r)
-						return r
-					} catch (e) {
-						console.error(`${fx} error`, e)
-					}
-				}
-			},
-
-			async obtenerCargaFirmadaAvatar() {
-				const fx = 'cuenta>obtenerCargaFirmadaAvatar'
-				try {
-					console.log(`%c${fx}`, 'color: #44ccff')
-					if (!elToken.value) throw 'Usuario no conectado'
-					const r = await clienteAPI({
-						url: `/avatar/putUrl`,
-						method: 'get',
-						headers: { Authorization: `Bearer ${elToken.value}` }
-					})
-					console.log(`${fx} r`, r)
-					return r.url
-				} catch (e) {
-					console.error(`${fx} error`, e)
-				}
-			},
-
-			async guardarUrlAvatar(url: string) {
-				const fx = 'cuenta>guardarUrlAvatar'
-				try {
-					console.log(fx, url)
-					if (!elToken.value) throw 'Usuario no conectado'
-					if (!url) throw 'falta url del avatar'
-					const r = await clienteAPI({
-						url: `/avatar/url`,
-						method: 'post',
-						data: { url },
-						headers: { Authorization: `Bearer ${elToken.value}` }
-					})
-					console.log(`${fx} r`, r)
-
-					sesion.usuario = r.usuario || false
-					return r
-				} catch (e) {
-					console.error(`${fx} error`, e)
-				}
-			}
-		}
+		if (!c.cuentaAPIURL) throw new Error('No se ha definido la URL de la API de cuentas')
 
 		nuxtApp.hook('app:mounted', () => {
 			// console.log('app:mounted')
 			// Llavero.init()
-			cuentaAPI.init()
+			cuentaAPI.init({
+				baseURL: c.public.cuentaAPIURL,
+				dev: c.public.dev
+			})
+
+			window.obtenerLlaveroAPI = obtenerLlaveroAPI
 		})
 		return {
 			provide: {

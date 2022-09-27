@@ -1,12 +1,10 @@
 import * as jose from 'jose'
-import type { KeyLike, JWTPayload } from 'jose'
-import dayjs from './fechas'
-// import chalk from 'chalk'
+import dayjs from './fecha'
+import chalk from 'chalk'
 import consolo from './consolo'
 
-const algFirma = 'RS256'
-const encFirma = 'A256GCM'
-const algEncriptacion = 'RSA-OAEP-256'
+const algFirma = 'ES256'
+const algEncriptacion = 'ECDH-ES'
 const encEncriptacion = 'A256GCM'
 
 const cripto = {
@@ -18,11 +16,10 @@ const cripto = {
 			// consolo.log(fx, { publica, privada })
 			return { publica, privada }
 		} catch (e) {
-			consolo.error(fx, e)
-			throw e
+			consolo.error(chalk.red(fx), e)
+			throw { error: `No se pudo ${fx}`, detalle: e }
 		}
 	},
-
 	async crearKeysEncriptacion() {
 		const fx = 'Cripto>crearKeysEncriptacion'
 		try {
@@ -31,25 +28,25 @@ const cripto = {
 			// consolo.log(fx, { publica, privada })
 			return { publica, privada }
 		} catch (e) {
-			consolo.error(fx, e)
-			throw e
+			consolo.error(chalk.red(fx), e)
+			throw { error: `No se pudo ${fx}`, detalle: e }
 		}
 	},
 
 	exportar: {
 		firma: {
-			async publica(llave: KeyLike) {
+			async publica(llave: jose.KeyLike) {
 				return await jose.exportSPKI(llave)
 			},
-			async privada(llave: KeyLike) {
+			async privada(llave: jose.KeyLike) {
 				return await jose.exportPKCS8(llave)
 			}
 		},
 		encriptacion: {
-			async publica(llave: KeyLike) {
+			async publica(llave: jose.KeyLike) {
 				return await jose.exportSPKI(llave)
 			},
-			async privada(llave: KeyLike) {
+			async privada(llave: jose.KeyLike) {
 				return await jose.exportPKCS8(llave)
 			}
 		}
@@ -77,68 +74,67 @@ const cripto = {
 		}
 	},
 
-	async encriptar(llavePublica: KeyLike, mensaje: string): Promise<string> {
-		const fx = 'Cripto>cripto.encriptar'
+	async encriptar(llavePublica: jose.KeyLike, json: jose.JWTPayload): Promise<string> {
+		const fx = 'Cripto>encriptar'
 		// consolo.log(fx)
 		try {
-			const encriptado = await new jose.CompactEncrypt(new TextEncoder().encode(mensaje))
+			const encriptado = await new jose.EncryptJWT(json)
 				.setProtectedHeader({ alg: algEncriptacion, enc: encEncriptacion })
 				.encrypt(llavePublica)
 			return encriptado
 		} catch (e) {
-			consolo.error(fx, e)
-			throw (e)
+			consolo.error(chalk.red(fx), e)
+			throw { error: `No se pudo ${fx}`, detalle: e }
 		}
 	},
-	async desencriptar(llavePrivada: KeyLike, jwe: string): Promise<string> {
-		const fx = 'Cripto>cripto.desencriptar'
-		// consolo.log(fx)
+	async decriptar(llavePrivada: jose.KeyLike, JWTString: string) {
+		const fx = 'Cripto>cripto.decriptar'
+		consolo.log(fx)
 		try {
-			const { plaintext } = await jose.compactDecrypt(jwe, llavePrivada)
-			const decodificado = new TextDecoder().decode(plaintext)
-			return decodificado
+			// const { payload, protectedHeader } = await jose.jwtDecrypt(JWTString, llavePrivada)
+			const { payload } = await jose.jwtDecrypt(JWTString, llavePrivada)
+			// console.log(fx, { payload, protectedHeader })
+			return payload
 		} catch (e) {
-			consolo.error(fx, e)
-			throw e
+			consolo.error(chalk.red(fx), e)
+			throw { error: `No se pudo ${fx}`, detalle: e }
 		}
 	},
 
-	async firmarToken(llavePrivada: jose.KeyLike, cuerpo: JWTPayload, issuer: string): Promise<string> {
-		const fx = 'Cripto>cripto.firmarToken'
+	async firmar(llavePrivada: jose.KeyLike, cuerpo: jose.JWTPayload, issuer: string) {
+		const fx = 'Cripto>firmar'
 		try {
 			const jwt = await new jose.SignJWT(cuerpo)
-				.setProtectedHeader({ alg: algFirma, enc: encFirma })
+				.setProtectedHeader({ alg: algFirma })
 				.setIssuedAt(dayjs().subtract(10, 's').unix())
 				.setIssuer(issuer)
-				// .setAudience(audience)
-				// .setExpirationTime('2h')
 				.sign(llavePrivada)
 			return jwt
 		} catch (e) {
-			consolo.error(fx, e)
-			throw 'No se pudo firmarToken'
+			consolo.error(chalk.red(fx), e)
+			throw { error: `No se pudo ${fx}`, detalle: e }
 		}
 	},
 
-	async verificarFirmaToken(llavePublica: jose.KeyLike, jwt: string, issuer: string): Promise<JWTPayload> {
-		const fx = 'Cripto>cripto.verificarFirmaToken'
+	async verificar(llavePublica: jose.KeyLike, jwt: string, issuer: string) {
+		const fx = 'Cripto>verificar'
 		try {
+			consolo.log(fx)
 			const { payload } = await jose.jwtVerify(jwt, llavePublica, {
 				issuer
 			})
-			// console.log(protectedHeader)
-			// console.log(payload)
 			return payload
 		} catch (e: any) {
+			// consolo.error(chalk.red(fx), 'code', e.code)
 			if (!e.code) {
-				consolo.error(fx, e)
-				throw e
+				consolo.error(chalk.red(fx), e)
+				throw { error: e }
 			}
-			if (e.code === 'ERR_JWS_SIGNATURE_VERIFICATION_FAILED') throw 'token no pasó verificación'
-			if (e.code === 'ERR_JWT_EXPIRED') throw 'token expirado'
+			if (e.code === 'ERR_JWS_SIGNATURE_VERIFICATION_FAILED') throw { error: 'token no pasó verificación de firma' }
+			if (e.code === 'ERR_JWT_EXPIRED') throw { error: 'token expirado' }
 
-			consolo.error(fx, e)
-			throw e
+			consolo.error(chalk.red(fx), e)
+			throw { error: `No se pudo ${fx}`, detalle: e }
 		}
 	}
 }

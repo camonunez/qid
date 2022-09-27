@@ -28,9 +28,9 @@ export default defineNuxtConfig({
 		tsConfig: {
 			compilerOptions: {
 				esModuleInterop: true,
-				allowSyntheticDefaultImports: true
+				allowSyntheticDefaultImports: true,
 			},
-			exclude: ['../dist', '../components.d.ts', '../node_modules', './node_modules']
+			exclude: ['../dist', '../components.d.ts', '../node_modules', './node_modules', './pluginsOff']
 		}
 	},
 
@@ -40,6 +40,7 @@ export default defineNuxtConfig({
 		// Keys within public, will be also exposed to the client-side
 		public: {
 			apiURL: dev ? 'https://api.pow.test' : 'https://api.qid.cl',
+			cuentaAPIURL: dev ? 'https://api.pow.test/criptocuentas' : 'https://api.qid.cl/criptocuentas',
 			dev
 		}
 	},

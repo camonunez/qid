@@ -7,10 +7,17 @@ import crearEmisorEventos from '@/lib/emisorEventos'
 
 // ClienteHTTP
 
-
-export default (baseURL: string) => {
+const generarCliente = (baseURL?: string) => {
+	const config = {
+		inicializado: false,
+		baseURL
+	}
+	if (baseURL) config.baseURL = baseURL
 
 	const clienteHTTP = async (request: AxiosRequestConfig, errorHandler?: null | any): Promise<any> =>{
+		if (!config.inicializado) throw 'clienteHTTP: no inicializado'
+		if (!config.baseURL) throw 'clienteHTTP: baseURL no está definido'
+
 		const ops = _.assignIn(
 			{
 				headers: {
@@ -20,7 +27,8 @@ export default (baseURL: string) => {
 			},
 			request
 		)
-		ops.url = `${baseURL}${ops.url}`
+		const url = `${config.baseURL}${ops.url}`
+		ops.url = url
 	
 		const r = await axios(ops)
 			.then(async r => {
@@ -51,8 +59,15 @@ export default (baseURL: string) => {
 	clienteHTTP.emit = emisorEventos.emit
 	clienteHTTP.off = emisorEventos.off
 
+	clienteHTTP.init = (baseURL: string) => {
+		config.baseURL = baseURL
+		config.inicializado = true
+	}
+
 	return clienteHTTP
 }
+
+export default generarCliente
 
 // const loguear = true
 

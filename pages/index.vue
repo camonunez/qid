@@ -1,7 +1,20 @@
 <template lang="pug">
-.EstoEsElIndex
+.flex.jcc.aic.minh100vh
+
+	.anchoComun
+		h1 Hola index
+
+		NuxtLink.boton(to="/a") App
 	
 
 </template>
 <script setup>
+console.log('hello script setup')
+function log(msg) {
+	console.log(msg)
+}
+
+definePageMeta({
+	title: 'Cuerdos'
+})
 </script>
