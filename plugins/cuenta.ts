@@ -15,8 +15,20 @@ import { TokenBody, Sesion } from './cuentas/types'
 import type { CredencialSesion } from './cuentas/types'
 
 declare global {
-	interface Window { obtenerLlaveroAPI: typeof obtenerLlaveroAPI; }
+	interface Window { 
+		obtenerLlaveroAPI: typeof obtenerLlaveroAPI;
+		cuentaAPI: typeof cuentaAPI;
+	 }
 }
+
+const usuarioSchema = z.object({
+	_id: z.string(),
+	email: validadorEmail,
+	nombre: z.string(),
+	apellido: z.string(),
+})
+
+// 
 
 const tokenReactivo = ref({
 	token: null,
@@ -96,12 +108,15 @@ export const usuario = computed(() => sesion.usuario)
 const clienteAPI = crearClienteHTTP()
 
 clienteAPI.on('http:hayRespuesta', () => {
+	console.warn('clienteAPI', 'http:hayRespuesta')
 	if (sesion.sinConexion) sesion.sinConexion = false
 })
 clienteAPI.on('http:sinRespuesta', () => {
+	console.warn('clienteAPI', 'http:sinRespuesta')
 	cuentaAPI.ping()
 })
 clienteAPI.on('desconectado', () => {
+	console.warn('clienteAPI', 'desconectado')
 	cuentaAPI.salir()
 })
 
@@ -139,40 +154,29 @@ const cuentaAPI = {
 		}
 	},
 
-	async llaveroPrincipal () {
-		const fx = 'cuenta>llaveroPrincipal'
-		try {
-			console.log(`%c${fx}`, 'color: #44CCFF')
-
-			const r = await clienteAPI({
-				url: `/llavero`,
-				method: 'get',
-			})
-
-			console.log(`${fx} r`, r)
-			// const llavero = Llavero.reinstanciar()
-			// llaveroAPICache = 
-		} catch (e) {
-			console.error(`${fx} error`, e)
-		}
-	},
-
-	async leer(t = elToken) {
+	async leer(t = elToken.value) {
 		const fx = 'cuenta>leer'
 		try {
 			console.log(`%c${fx}`, 'color: #44CCFF')
-
 			const tkn = testToken.parse(t)
-
 			const r = await clienteAPI({
 				url: ``,
 				method: 'get',
 				headers: { Authorization: `Bearer ${tkn}` }
 			})
-
 			console.log(`${fx} r`, r)
 
-			sesion.usuario = r.usuario
+			const respuestaSchema = z.object({
+				token: validadorToken,
+				encriptado: z.string()
+			})
+			const { encriptado } = respuestaSchema.parse(r)
+			
+			const llaveroCliente = await obtenerLlaveroPropio()
+			const decriptado = await llaveroCliente.decriptar(encriptado)
+			console.log(`${fx} decriptado`, decriptado)
+			const usuario = usuarioSchema.parse(decriptado)
+			sesion.usuario = usuario
 		} catch (e) {
 			console.error(`${fx} error`, e)
 		}
@@ -183,16 +187,8 @@ const cuentaAPI = {
 		const tkn = testToken.parse(token)
 		try {
 			console.log(`%c${fx}`, 'color: #44ccff')
-			const r = await clienteAPI({
-				url: ``,
-				method: 'get',
-				headers: { Authorization: `Bearer ${tkn}` }
-			})
-
-			console.log(`${fx} r`, r)
-
-			sesion.usuario = r.usuario
 			elToken.value = tkn
+			return await this.leer(tkn)
 		} catch (e) {
 			console.error(`${fx} error`, e)
 		}
@@ -201,25 +197,22 @@ const cuentaAPI = {
 	async ingresar(email: string, password: string) {
 		const fx = 'cuenta>ingresar'
 		try {
-			const inputIngresoSchema = z.object({
+			const ingresoSchema = z.object({
 				password: validadorPass,
 				email: validadorEmail
 			})
-			inputIngresoSchema.parse({ email, password })
+			const datos = ingresoSchema.parse({ email, password })
 			console.log(fx, { email, password })
 
 			const llaveroCliente = await obtenerLlaveroPropio()
 			const llaveroPublicoCliente = await llaveroCliente.exportarLlaveroPublico()
-			const datos = { email, password }
 
 			const llaveroAPI = await obtenerLlaveroAPI()
-			const emailPassEncriptado = await llaveroAPI.encriptar(datos)
+			const emailYPass = await llaveroAPI.encriptar(datos)
 
-			console.log('datos', datos)
-			console.log('encriptado', emailPassEncriptado)
 			const r = await clienteAPI({
 				url: `/ingresar`,
-				data: { encriptado: emailPassEncriptado, llaveroPublicoCliente },
+				data: { encriptado: emailYPass, llaveroPublicoCliente },
 				method: 'post'
 			})
 
@@ -231,18 +224,13 @@ const cuentaAPI = {
 			const decriptado = await llaveroCliente.decriptar(encriptado)
 			console.log(`${fx} token`, token)
 			console.log(`${fx} decriptado`, decriptado)
-			const usuarioSchema = z.object({
-				_id: z.string(),
-				email: validadorEmail,
-				nombre: z.string(),
-				apellido: z.string(),
-			})
 			const usuario = usuarioSchema.parse(decriptado)
-			if (r.ok) {
-				sesion.usuario = usuario
-				elToken.value = token
+			sesion.usuario = usuario
+			elToken.value = token
+			return {
+				usuario,
+				token
 			}
-			return r
 		} catch (e) {
 			console.error(`${fx} error`, e)
 		}
@@ -262,22 +250,47 @@ const cuentaAPI = {
 		}
 	},
 
-	async crearCuenta(nombre: string, apellido: string, email: string, password: string) {
-		const fx = 'cuenta>crearCuenta'
+	async registrar(nombre: string, apellido: string, email: string, password: string) {
+		const fx = 'cuenta>registrar'
 		try {
 			console.log(fx, { nombre, apellido, email, password })
+			const registroSchema = z.object({
+				nombre: z.string(),
+				apellido: z.string(),
+				password: validadorPass,
+				email: validadorEmail
+			})
+
+			const datos = registroSchema.parse({ nombre, apellido, email, password })
+			const llaveroAPI = await obtenerLlaveroAPI()
+			const registroEncriptado = await llaveroAPI.encriptar(datos)
+
+			const llaveroCliente = await obtenerLlaveroPropio()
+			const llaveroPublicoCliente = await llaveroCliente.exportarLlaveroPublico()
+
 			const r = await clienteAPI({
-				url: `/crear`,
-				data: { nombre, apellido, email, password },
+				url: `/registrar`,
+				data: { encriptado: registroEncriptado, llaveroPublicoCliente },
 				method: 'post'
 			})
 			console.log(`${fx} r`, r)
 
-			sesion.usuario = r.usuario || false
-			elToken.value = r.token || null
-			if (r.token) await cuentaAPI.leer()
+			const respuestaSchema = z.object({
+				token: validadorToken,
+				encriptado: z.string()
+			})
+			const { token, encriptado } = respuestaSchema.parse(r)
+			const decriptado = await llaveroCliente.decriptar(encriptado)
+			console.log(`${fx} token`, token)
+			console.log(`${fx} decriptado`, decriptado)
+			const usuario = usuarioSchema.parse(decriptado)
+			sesion.usuario = usuario
+			elToken.value = token
+			return {
+				usuario,
+				token
+			}
 
-			return r
 		} catch (e) {
 			console.error(`${fx} error`, e)
 		}
@@ -374,6 +387,7 @@ export default defineNuxtPlugin(nuxtApp => {
 			})
 
 			window.obtenerLlaveroAPI = obtenerLlaveroAPI
+			window.cuentaAPI = cuentaAPI
 		})
 		return {
 			provide: {

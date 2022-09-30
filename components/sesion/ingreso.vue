@@ -375,11 +375,6 @@ async function ingresar() {
 		conectando.value = true
 		const s = await $cuentaAPI.ingresar(email, password)
 		$consolo.log('r', s)
-
-		if (!s.ok) {
-			// tratarErrorDeIngreso(r.error)
-			console.error(r)
-		}
 	} catch (e) {
 		console.error('caught', e)
 		// } finally {
@@ -408,7 +403,7 @@ async function registrar() {
 		conectando.value = true
 		const { nombre, apellido, email, password } = r.data
 		$consolo.log('registrar', { nombre, apellido, email, password })
-		await $cuentaAPI.crearCuenta(nombre, apellido, email, password)
+		await $cuentaAPI.registrar(nombre, apellido, email, password)
 	} catch (e) {
 		$consolo.error('registrar', e)
 	} finally {
