@@ -1,38 +1,29 @@
 <template lang="pug">
-//- .elQR(v-html="qr")
-div
-	.elQR(ref="qr")
-	button(@click="logQRRef") logQRRef
+.qrWrapper
+	.elQR(v-html="qr")
+	.tac(v-if="url" @click="generarQR") {{id}}
 </template>
 <script setup lang="ts">
-// import QRCode from 'qrcode'
 import QRCodeStyling, {
 	Options
 } from 'qr-code-styling';
+import MiniID from '@/lib/miniid';
 
-const qr = ref<HTMLDivElement>()
-// const qr = ref<string | null>(null)
+const qr = ref<string>()
+const id = await MiniID()
 
-// async function generarQR (texto: string): Promise<string> {
-// 	return await new Promise((resolve, reject) => {
-// 		QRCode.toString(texto, { type: 'svg' }, (err, svg) => {
-// 			if (err) reject(err)
-// 			return resolve(svg)
-// 		})
-// 	})
-// }
 let generadorQR: QRCodeStyling | null = null
 async function generarQRConEstilo(texto: string): Promise<void> {
-	if (!qr.value) {
-		console.log('No se ha encontrado el elemento')
-		return
-	}
+	// if (!qr.value) {
+	// 	return
+	// }
+	// const id = await MiniID()
 	const config = {
-		width: 300,
-		height: 300,
+		width: 100,
+		height: 100,
 		type: "svg",
 		data: texto,
-		image: "/favicon.svg",
+		// image: "/favicon.svg",
 		dotsOptions: {
 			color: "#000000",
 			type: "rounded"
@@ -40,50 +31,59 @@ async function generarQRConEstilo(texto: string): Promise<void> {
 		backgroundOptions: {
 			color: "#ffffff",
 		},
-		imageOptions: {
-			crossOrigin: "anonymous",
-			margin: 14
-		}
+		// imageOptions: {
+		// 	crossOrigin: "anonymous",
+		// 	margin: 4
+		// }
 	} as Options
-	if (!generadorQR) {
-		generadorQR = new QRCodeStyling(config);
-	} else {
-		generadorQR.update(config)
+	
+	generadorQR = new QRCodeStyling(config);
+	const getRawData = await generadorQR.getRawData('svg') 
+	const svg = generadorQR._svg
+	if (!svg) {
+		console.error('sin svg')
+		return
 	}
-
-	qr.value.innerHTML = '';
-	while (qr.value.lastElementChild) {
-		qr.value.removeChild(qr.value.lastElementChild)
-	}
-
-	generadorQR.append(qr.value)
+	const svgString = svg.outerHTML
+	const svgListo = svgString.replaceAll('clip-path-background-color', `el-${id}-clip-path-background-color`).replaceAll('clip-path-dot-color', `el-${id}-clip-path-dot-color`)
+	
+	qr.value = svgListo
 }
 
-const props = defineProps<{
-	texto: string
-}>()
-
+function generarQR () {
+	if (!props.url) return
+	generarQRConEstilo(props.url)
+}
 
 watch(qr, async (qrAhora, qrAntes) => {
-	if (!qrAntes && qrAhora && url.value) {
-		await generarQRConEstilo(url.value)
+	if (!qrAntes && qrAhora && props.url) {
+		await generarQRConEstilo(props.url)
 	}
 })
 
-const url = computed(() => props.texto ? `https://go.boxmagic.app/referencia?${props.texto}` : null)
-watch(url, async (url) => {
+const props = defineProps<{
+	id: string
+	url: string
+}>()
+
+watch(() => props.url, async (url) => {
 	if (url) {
 		await generarQRConEstilo(url)
 	}
-})
+}, { immediate: true })
 
 // }, { immediate: true })
-function logQRRef() {
-	console.log('qr.value', qr.value)
-}
+// function logQRRef() {
+// 	console.log('qr.value', qr.value)
+// }
 onMounted(() => {
-	console.log('url.value', url.value)
-	if (url.value) generarQRConEstilo(url.value)
+	// console.log('url.value', url.value)
+	if (props.url) generarQR()
 })
 
 </script>
+<style lang="sass" scoped>
+// .qrWrapper
+// 	page-break-inside: avoid
+// 	border: 1px solid red
+</style>

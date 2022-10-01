@@ -1,6 +1,6 @@
 <template lang="pug">
 div
-	RenderQr(texto="hola")
+	RenderQr(id="hola" url="asdadsasd")
 </template>
 <script setup lang="ts">
 

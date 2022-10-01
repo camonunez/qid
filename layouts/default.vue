@@ -1,6 +1,6 @@
 <template lang="pug">
 .layoutDefaultRoot
-	p Este es el layout por defecto
+	//- p Este es el layout por defecto
 	slot
 
 </template>
