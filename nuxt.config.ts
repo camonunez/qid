@@ -30,7 +30,7 @@ export default defineNuxtConfig({
 				esModuleInterop: true,
 				allowSyntheticDefaultImports: true,
 			},
-			exclude: ['../dist', '../components.d.ts', '../node_modules', './node_modules', './pluginsOff']
+			exclude: ['../dist', '../components.d.ts', '../node_modules', './node_modules']
 		}
 	},
 
@@ -47,13 +47,16 @@ export default defineNuxtConfig({
 
 	css: ['~/sass/base.sass'],
 
-	head: {
+	meta: {
+		title: 'QID',
 		link: [
-			{ rel: 'icon', type: 'image/x-icon', href: 'favicon.svg' },
+			{ hid: 'favicon', rel: 'icon', type: 'image/x-icon', href: '/favicon.svg' },
 		]
 	},
 
 	modules: [
 		'@vueuse/nuxt',
 	],
+
+	sourcemap: true
 })

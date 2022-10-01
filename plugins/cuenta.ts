@@ -17,7 +17,7 @@ import type { CredencialSesion } from './cuentas/types'
 declare global {
 	interface Window { 
 		obtenerLlaveroAPI: typeof obtenerLlaveroAPI;
-		cuentaAPI: typeof cuentaAPI;
+		cuentaAPI: any;
 	 }
 }
 
@@ -39,14 +39,17 @@ const tokenReactivo = ref({
 export const elToken = computed<string | null>({
 	get: () => tokenReactivo.value.token,
 	set: tkn => {
+		console.log('set elToken', tkn)
 		if (!tkn) {
 			tokenReactivo.value = {
 				token: null,
 				decodificado: null,
 				expConfianza: null
 			}
+			cuentaStore.removeItem('token')
 			return
 		}
+		cuentaStore.setItem('token', tkn)
 		const decodificado = tkn ? jwtDecode<TokenBody>(tkn) : null
 		tokenReactivo.value = {
 			token: tkn,
@@ -129,6 +132,7 @@ const cuentaAPI = {
 		try {
 			clienteAPI.init(config.baseURL)
 			const token = await cuentaStore.getItem('token')
+			console.log(fx, { token})
 			if (typeof token === 'string') cuentaAPI.ingresarConToken(token)
 			else cuentaAPI.salir()
 		} catch (e) {
@@ -167,13 +171,12 @@ const cuentaAPI = {
 			console.log(`${fx} r`, r)
 
 			const respuestaSchema = z.object({
-				token: validadorToken,
-				encriptado: z.string()
+				usuarioEncriptado: z.string()
 			})
-			const { encriptado } = respuestaSchema.parse(r)
+			const { usuarioEncriptado } = respuestaSchema.parse(r)
 			
 			const llaveroCliente = await obtenerLlaveroPropio()
-			const decriptado = await llaveroCliente.decriptar(encriptado)
+			const decriptado = await llaveroCliente.decriptar(usuarioEncriptado)
 			console.log(`${fx} decriptado`, decriptado)
 			const usuario = usuarioSchema.parse(decriptado)
 			sesion.usuario = usuario
@@ -218,12 +221,11 @@ const cuentaAPI = {
 
 			const respuestaSchema = z.object({
 				token: validadorToken,
-				encriptado: z.string()
+				usuarioEncriptado: z.string()
 			})
-			const { token, encriptado } = respuestaSchema.parse(r)
-			const decriptado = await llaveroCliente.decriptar(encriptado)
-			console.log(`${fx} token`, token)
-			console.log(`${fx} decriptado`, decriptado)
+			const { token, usuarioEncriptado } = respuestaSchema.parse(r)
+			const decriptado = await llaveroCliente.decriptar(usuarioEncriptado)
+
 			const usuario = usuarioSchema.parse(decriptado)
 			sesion.usuario = usuario
 			elToken.value = token
@@ -277,10 +279,10 @@ const cuentaAPI = {
 
 			const respuestaSchema = z.object({
 				token: validadorToken,
-				encriptado: z.string()
+				usuarioEncriptado: z.string()
 			})
-			const { token, encriptado } = respuestaSchema.parse(r)
-			const decriptado = await llaveroCliente.decriptar(encriptado)
+			const { token, usuarioEncriptado } = respuestaSchema.parse(r)
+			const decriptado = await llaveroCliente.decriptar(usuarioEncriptado)
 			console.log(`${fx} token`, token)
 			console.log(`${fx} decriptado`, decriptado)
 			const usuario = usuarioSchema.parse(decriptado)
@@ -342,6 +344,15 @@ const cuentaAPI = {
 				method: 'get',
 				headers: { Authorization: `Bearer ${elToken.value}` }
 			})
+			const respuestaSchema = z.object({
+				urlEncriptada: z.string()
+			})
+			const { urlEncriptada } = respuestaSchema.parse(r)
+
+			const llaveroCliente = await obtenerLlaveroPropio()
+			const decriptado = await llaveroCliente.decriptar(urlEncriptada)
+			console.log(`${fx} decriptado`, decriptado)
+			const url = z.string().parse(decriptado.urlEncriptada)
 			console.log(`${fx} r`, r)
 			return r.url
 		} catch (e) {

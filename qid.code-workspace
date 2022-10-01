@@ -28,5 +28,6 @@
 			"terminal.background": "#111"
 		},
 		"window.title": "qID ${separator}${activeEditorShort}",
+		"editor.tabSize": 2
 	}
 }
